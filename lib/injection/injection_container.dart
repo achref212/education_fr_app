@@ -11,6 +11,8 @@ import '../features/auth/domain/usecases/get_current_user_use_case.dart';
 import '../features/auth/domain/usecases/login_use_case.dart';
 import '../features/auth/domain/usecases/logout_use_case.dart';
 import '../features/auth/domain/usecases/register_use_case.dart';
+import '../features/auth/presentation/cubit/login_cubit.dart';
+import '../features/auth/presentation/cubit/register_cubit.dart';
 import '../features/progress/data/datasources/progress_local_data_source.dart';
 import '../features/progress/data/datasources/progress_remote_data_source.dart';
 import '../features/progress/data/repositories/progress_repository_impl.dart';
@@ -86,6 +88,14 @@ void _registerAuthFeature() {
       getCurrentUser: sl<GetCurrentUserUseCase>(),
       prefs: sl<SharedPreferences>(),
     ),
+  );
+
+  sl.registerFactory<LoginCubit>(
+    () => LoginCubit(loginUseCase: sl<LoginUseCase>()),
+  );
+
+  sl.registerFactory<RegisterCubit>(
+    () => RegisterCubit(registerUseCase: sl<RegisterUseCase>()),
   );
 }
 

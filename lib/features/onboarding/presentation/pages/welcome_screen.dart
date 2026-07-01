@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
@@ -204,7 +205,7 @@ class _PrimaryButton extends StatelessWidget {
       height: 52,
       child: ElevatedButton(
         onPressed: () {
-          // TODO: navigate to register screen
+          context.router.push(const RegisterRoute());
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -244,7 +245,7 @@ class _LoginRow extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            // TODO: navigate to login screen
+            context.router.push(const LoginRoute());
           },
           style: TextButton.styleFrom(
             foregroundColor: AppColors.primary,

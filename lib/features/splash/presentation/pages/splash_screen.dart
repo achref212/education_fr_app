@@ -34,6 +34,8 @@ class _SplashView extends StatelessWidget {
         if (state is SplashAuthenticated) {
           // TODO: replace with main app route once available
           context.router.replace(const WelcomeRoute());
+        } else if (state is SplashAuthenticated) {
+          context.router.replace(const HomeRoute());
         } else if (state is SplashUnauthenticated) {
           if (state.hasSeenOnboarding) {
             context.router.replace(const WelcomeRoute());
