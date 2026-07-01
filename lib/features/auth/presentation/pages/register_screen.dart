@@ -28,7 +28,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _passwordController = TextEditingController();
   String? _selectedLevel;
 
-  final List<String> _levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+  final List<String> _levels = [
+    '1ère année primaire',
+    '2e année primaire',
+    '3e année primaire',
+    '4e année primaire',
+    '5e année primaire',
+    '6e année primaire',
+  ];
 
   @override
   void dispose() {
