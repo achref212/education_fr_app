@@ -1,0 +1,93 @@
+import 'package:dio/dio.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../core/network/api_client.dart';
+import '../core/storage/secure_token_storage.dart';
+import '../features/auth/data/datasources/auth_remote_data_source.dart';
+import '../features/auth/data/repositories/auth_repository_impl.dart';
+import '../features/auth/domain/repositories/auth_repository.dart';
+import '../features/auth/domain/usecases/get_current_user_use_case.dart';
+import '../features/auth/domain/usecases/login_use_case.dart';
+import '../features/auth/domain/usecases/logout_use_case.dart';
+import '../features/auth/domain/usecases/register_use_case.dart';
+import '../features/progress/data/datasources/progress_local_data_source.dart';
+import '../features/progress/data/datasources/progress_remote_data_source.dart';
+import '../features/progress/data/repositories/progress_repository_impl.dart';
+import '../features/progress/domain/repositories/progress_repository.dart';
+import '../features/progress/domain/usecases/add_quiz_score_use_case.dart';
+import '../features/progress/domain/usecases/get_progress_use_case.dart';
+import '../features/progress/domain/usecases/mark_lesson_completed_use_case.dart';
+import '../features/progress/domain/usecases/save_progress_use_case.dart';
+
+final GetIt sl = GetIt.instance;
+
+Future<void> initializeDependencies() async {
+  await _registerCore();
+  _registerAuthFeature();
+  _registerProgressFeature();
+}
+
+Future<void> _registerCore() async {
+  // flutter_secure_storage — singleton
+  sl.registerLazySingleton<SecureTokenStorage>(() => SecureTokenStorage());
+
+  // Dio — singleton, built with auth + error interceptors
+  sl.registerLazySingleton<Dio>(() => buildApiClient(sl<SecureTokenStorage>()));
+
+  // SharedPreferences — async singleton (must await before registration)
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerSingleton<SharedPreferences>(sharedPreferences);
+}
+
+void _registerAuthFeature() {
+  // Data sources
+  sl.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(sl<Dio>()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      remoteDataSource: sl<AuthRemoteDataSource>(),
+      tokenStorage: sl<SecureTokenStorage>(),
+    ),
+  );
+
+  // Use cases
+  sl.registerFactory<LoginUseCase>(() => LoginUseCase(sl<AuthRepository>()));
+  sl.registerFactory<RegisterUseCase>(
+      () => RegisterUseCase(sl<AuthRepository>()));
+  sl.registerFactory<GetCurrentUserUseCase>(
+      () => GetCurrentUserUseCase(sl<AuthRepository>()));
+  sl.registerFactory<LogoutUseCase>(() => LogoutUseCase(sl<AuthRepository>()));
+}
+
+void _registerProgressFeature() {
+  // Data sources
+  sl.registerLazySingleton<ProgressRemoteDataSource>(
+    () => ProgressRemoteDataSourceImpl(sl<Dio>()),
+  );
+  sl.registerLazySingleton<ProgressLocalDataSource>(
+    () => ProgressLocalDataSourceImpl(sl<SharedPreferences>()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<ProgressRepository>(
+    () => ProgressRepositoryImpl(
+      remoteDataSource: sl<ProgressRemoteDataSource>(),
+      localDataSource: sl<ProgressLocalDataSource>(),
+      tokenStorage: sl<SecureTokenStorage>(),
+    ),
+  );
+
+  // Use cases
+  sl.registerFactory<GetProgressUseCase>(
+      () => GetProgressUseCase(sl<ProgressRepository>()));
+  sl.registerFactory<SaveProgressUseCase>(
+      () => SaveProgressUseCase(sl<ProgressRepository>()));
+  sl.registerFactory<MarkLessonCompletedUseCase>(
+      () => MarkLessonCompletedUseCase(sl<ProgressRepository>()));
+  sl.registerFactory<AddQuizScoreUseCase>(
+      () => AddQuizScoreUseCase(sl<ProgressRepository>()));
+}
