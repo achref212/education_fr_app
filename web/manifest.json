@@ -1,6 +1,6 @@
 {
-    "name": "education_fr_app",
-    "short_name": "education_fr_app",
+    "name": "DELFy",
+    "short_name": "DELFy",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
