@@ -82,7 +82,10 @@ void _registerAuthFeature() {
   sl.registerFactory<LogoutUseCase>(() => LogoutUseCase(sl<AuthRepository>()));
 
   sl.registerFactory<SplashCubit>(
-    () => SplashCubit(getCurrentUser: sl<GetCurrentUserUseCase>()),
+    () => SplashCubit(
+      getCurrentUser: sl<GetCurrentUserUseCase>(),
+      prefs: sl<SharedPreferences>(),
+    ),
   );
 }
 

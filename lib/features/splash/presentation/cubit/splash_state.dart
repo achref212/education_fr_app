@@ -10,4 +10,7 @@ final class SplashLoading extends SplashState {}
 final class SplashAuthenticated extends SplashState {}
 
 /// No valid session — navigate to onboarding / login.
-final class SplashUnauthenticated extends SplashState {}
+final class SplashUnauthenticated extends SplashState {
+  SplashUnauthenticated({required this.hasSeenOnboarding});
+  final bool hasSeenOnboarding;
+}
