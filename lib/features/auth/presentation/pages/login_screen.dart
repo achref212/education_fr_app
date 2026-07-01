@@ -52,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
         listener: (context, state) {
           state.maybeWhen(
             success: () {
-              context.router.replaceAll([const HomeRoute()]);
+              context.router.replaceAll([const MainRoute()]);
             },
             error: (message) {
               ScaffoldMessenger.of(context).showSnackBar(

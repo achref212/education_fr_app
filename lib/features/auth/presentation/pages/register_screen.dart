@@ -63,7 +63,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         listener: (context, state) {
           state.maybeWhen(
             success: () {
-              context.router.replaceAll([const HomeRoute()]);
+              context.router.replaceAll([const MainRoute()]);
             },
             error: (message) {
               ScaffoldMessenger.of(context).showSnackBar(
