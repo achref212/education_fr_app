@@ -1,6 +1,3 @@
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
-
 /// All backend API endpoint constants.
 ///
 /// Configure the base URL at build time:
@@ -15,9 +12,9 @@ class ApiConstants {
     const definedUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
     if (definedUrl.isNotEmpty) return definedUrl;
 
-    if (kIsWeb) return 'http://localhost:8000';
-    if (Platform.isAndroid) return 'http://10.0.2.2:8000';
-    return 'http://localhost:8000';
+    // We noticed you're using a physical device (Xiaomi). 
+    // Use your computer's local IP address instead of localhost or 10.0.2.2
+    return 'http://192.168.100.21:8000';
   }
 
   static const int connectTimeoutMs = 15000;

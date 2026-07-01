@@ -5,7 +5,7 @@ import 'user_model.dart';
 part 'token_response_model.g.dart';
 
 /// Maps the `TokenResponse` schema returned by `/auth/register` and `/auth/login`.
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class TokenResponseModel {
   const TokenResponseModel({
     required this.accessToken,
