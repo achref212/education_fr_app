@@ -24,6 +24,10 @@ mixin _$User {
   DateTime get createdAt => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
   bool get isActive => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
+  DateTime? get dateOfBirth => throw _privateConstructorUsedError;
+  String? get classLevel => throw _privateConstructorUsedError;
+  String? get schoolId => throw _privateConstructorUsedError;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -44,7 +48,11 @@ abstract class $UserCopyWith<$Res> {
       String level,
       DateTime createdAt,
       String role,
-      bool isActive});
+      bool isActive,
+      String? phone,
+      DateTime? dateOfBirth,
+      String? classLevel,
+      String? schoolId});
 }
 
 /// @nodoc
@@ -70,6 +78,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? createdAt = null,
     Object? role = null,
     Object? isActive = null,
+    Object? phone = freezed,
+    Object? dateOfBirth = freezed,
+    Object? classLevel = freezed,
+    Object? schoolId = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -104,6 +116,22 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
               as bool,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dateOfBirth: freezed == dateOfBirth
+          ? _value.dateOfBirth
+          : dateOfBirth // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      classLevel: freezed == classLevel
+          ? _value.classLevel
+          : classLevel // ignore: cast_nullable_to_non_nullable
+              as String?,
+      schoolId: freezed == schoolId
+          ? _value.schoolId
+          : schoolId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -123,7 +151,11 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       String level,
       DateTime createdAt,
       String role,
-      bool isActive});
+      bool isActive,
+      String? phone,
+      DateTime? dateOfBirth,
+      String? classLevel,
+      String? schoolId});
 }
 
 /// @nodoc
@@ -146,6 +178,10 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? createdAt = null,
     Object? role = null,
     Object? isActive = null,
+    Object? phone = freezed,
+    Object? dateOfBirth = freezed,
+    Object? classLevel = freezed,
+    Object? schoolId = freezed,
   }) {
     return _then(_$UserImpl(
       id: null == id
@@ -180,6 +216,22 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.isActive
           : isActive // ignore: cast_nullable_to_non_nullable
               as bool,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      dateOfBirth: freezed == dateOfBirth
+          ? _value.dateOfBirth
+          : dateOfBirth // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      classLevel: freezed == classLevel
+          ? _value.classLevel
+          : classLevel // ignore: cast_nullable_to_non_nullable
+              as String?,
+      schoolId: freezed == schoolId
+          ? _value.schoolId
+          : schoolId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -195,7 +247,11 @@ class _$UserImpl extends _User {
       required this.level,
       required this.createdAt,
       this.role = 'user',
-      this.isActive = true})
+      this.isActive = true,
+      this.phone,
+      this.dateOfBirth,
+      this.classLevel,
+      this.schoolId})
       : super._();
 
   @override
@@ -216,10 +272,18 @@ class _$UserImpl extends _User {
   @override
   @JsonKey()
   final bool isActive;
+  @override
+  final String? phone;
+  @override
+  final DateTime? dateOfBirth;
+  @override
+  final String? classLevel;
+  @override
+  final String? schoolId;
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, level: $level, createdAt: $createdAt, role: $role, isActive: $isActive)';
+    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, level: $level, createdAt: $createdAt, role: $role, isActive: $isActive, phone: $phone, dateOfBirth: $dateOfBirth, classLevel: $classLevel, schoolId: $schoolId)';
   }
 
   @override
@@ -238,12 +302,31 @@ class _$UserImpl extends _User {
                 other.createdAt == createdAt) &&
             (identical(other.role, role) || other.role == role) &&
             (identical(other.isActive, isActive) ||
-                other.isActive == isActive));
+                other.isActive == isActive) &&
+            (identical(other.phone, phone) || other.phone == phone) &&
+            (identical(other.dateOfBirth, dateOfBirth) ||
+                other.dateOfBirth == dateOfBirth) &&
+            (identical(other.classLevel, classLevel) ||
+                other.classLevel == classLevel) &&
+            (identical(other.schoolId, schoolId) ||
+                other.schoolId == schoolId));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, email, firstName, lastName,
-      level, createdAt, role, isActive);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      email,
+      firstName,
+      lastName,
+      level,
+      createdAt,
+      role,
+      isActive,
+      phone,
+      dateOfBirth,
+      classLevel,
+      schoolId);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -263,7 +346,11 @@ abstract class _User extends User {
       required final String level,
       required final DateTime createdAt,
       final String role,
-      final bool isActive}) = _$UserImpl;
+      final bool isActive,
+      final String? phone,
+      final DateTime? dateOfBirth,
+      final String? classLevel,
+      final String? schoolId}) = _$UserImpl;
   const _User._() : super._();
 
   @override
@@ -282,6 +369,14 @@ abstract class _User extends User {
   String get role;
   @override
   bool get isActive;
+  @override
+  String? get phone;
+  @override
+  DateTime? get dateOfBirth;
+  @override
+  String? get classLevel;
+  @override
+  String? get schoolId;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.

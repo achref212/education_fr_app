@@ -22,8 +22,15 @@ class ApiConstants {
 
   // Auth
   static const String register = '/auth/register';
+  static const String verifyRegistration = '/auth/verify-registration';
+  static const String resendActivation = '/auth/resend-activation';
+  static const String forgotPassword = '/auth/forgot-password';
+  static const String verifyResetCode = '/auth/verify-reset-code';
+  static const String resetPassword = '/auth/reset-password';
+  static const String schools = '/auth/schools';
   static const String login = '/auth/login';
   static const String me = '/auth/me';
+  static const String changePassword = '/auth/change-password';
 
   // Progress
   static const String progress = '/progress';

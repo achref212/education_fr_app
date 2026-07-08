@@ -3,22 +3,25 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/usecase/usecase.dart';
-import '../entities/user.dart';
+import '../entities/register_result.dart';
 import '../repositories/auth_repository.dart';
 
-class RegisterUseCase implements UseCase<User, RegisterParams> {
+class RegisterUseCase implements UseCase<RegisterResult, RegisterParams> {
   RegisterUseCase(this._repository);
 
   final AuthRepository _repository;
 
   @override
-  Future<Either<Failure, User>> call(RegisterParams params) =>
+  Future<Either<Failure, RegisterResult>> call(RegisterParams params) =>
       _repository.register(
         email: params.email,
         password: params.password,
         firstName: params.firstName,
         lastName: params.lastName,
-        level: params.level,
+        classLevel: params.classLevel,
+        schoolId: params.schoolId,
+        phone: params.phone,
+        dateOfBirth: params.dateOfBirth,
       );
 }
 
@@ -28,15 +31,30 @@ class RegisterParams extends Equatable {
     required this.password,
     required this.firstName,
     required this.lastName,
-    required this.level,
+    required this.classLevel,
+    this.schoolId,
+    required this.phone,
+    required this.dateOfBirth,
   });
 
   final String email;
   final String password;
   final String firstName;
   final String lastName;
-  final String level;
+  final String classLevel;
+  final String? schoolId;
+  final String phone;
+  final DateTime dateOfBirth;
 
   @override
-  List<Object?> get props => [email, password, firstName, lastName, level];
+  List<Object?> get props => [
+        email,
+        password,
+        firstName,
+        lastName,
+        classLevel,
+        schoolId,
+        phone,
+        dateOfBirth,
+      ];
 }

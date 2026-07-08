@@ -14,11 +14,21 @@ class User with _$User {
     required DateTime createdAt,
     @Default('user') String role,
     @Default(true) bool isActive,
+    String? phone,
+    DateTime? dateOfBirth,
+    String? classLevel,
+    String? schoolId,
   }) = _User;
 
   const User._();
 
   String get displayName => '$firstName $lastName';
+
+  String get initials {
+    final first = firstName.isNotEmpty ? firstName[0].toUpperCase() : '';
+    final last = lastName.isNotEmpty ? lastName[0].toUpperCase() : '';
+    return '$first$last';
+  }
 
   bool get isAdmin => role == 'admin';
 }

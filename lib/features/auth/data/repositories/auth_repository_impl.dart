@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/storage/secure_token_storage.dart';
+import '../../domain/entities/register_result.dart';
+import '../../domain/entities/school.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_remote_data_source.dart';
@@ -18,12 +20,15 @@ class AuthRepositoryImpl implements AuthRepository {
   final SecureTokenStorage _tokenStorage;
 
   @override
-  Future<Either<Failure, User>> register({
+  Future<Either<Failure, RegisterResult>> register({
     required String email,
     required String password,
     required String firstName,
     required String lastName,
-    required String level,
+    required String classLevel,
+    String? schoolId,
+    required String phone,
+    required DateTime dateOfBirth,
   }) async {
     try {
       final response = await _remoteDataSource.register(
@@ -31,10 +36,113 @@ class AuthRepositoryImpl implements AuthRepository {
         password: password,
         firstName: firstName,
         lastName: lastName,
-        level: level,
+        classLevel: classLevel,
+        schoolId: schoolId,
+        phone: phone,
+        dateOfBirth: dateOfBirth,
+      );
+      return Right(RegisterResult(
+        email: email,
+        registrationStateToken: response.registrationStateToken,
+        message: response.message,
+      ));
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> verifyRegistration({
+    required String email,
+    required String code,
+    required String registrationStateToken,
+  }) async {
+    try {
+      final response = await _remoteDataSource.verifyRegistration(
+        email: email,
+        code: code,
+        registrationStateToken: registrationStateToken,
       );
       await _tokenStorage.saveAccessToken(response.accessToken);
       return Right(response.user.toDomain());
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String?>> resendActivation({required String email}) async {
+    try {
+      final response = await _remoteDataSource.resendActivation(email: email);
+      return Right(response.registrationStateToken);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String?>> forgotPassword({required String email}) async {
+    try {
+      final response = await _remoteDataSource.forgotPassword(email: email);
+      return Right(response.resetStateToken);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> verifyResetCode({
+    required String email,
+    required String code,
+    required String resetStateToken,
+  }) async {
+    try {
+      final response = await _remoteDataSource.verifyResetCode(
+        email: email,
+        code: code,
+        resetStateToken: resetStateToken,
+      );
+      return Right(response.resetToken);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> resetPassword({
+    required String email,
+    required String resetToken,
+    required String newPassword,
+  }) async {
+    try {
+      await _remoteDataSource.resetPassword(
+        email: email,
+        resetToken: resetToken,
+        newPassword: newPassword,
+      );
+      return const Right(unit);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<School>>> getSchools() async {
+    try {
+      final schools = await _remoteDataSource.getSchools();
+      return Right(schools.map((s) => s.toDomain()).toList());
     } on DioException catch (e) {
       return Left(_mapDioFailure(e));
     } catch (e) {
@@ -69,6 +177,46 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final userModel = await _remoteDataSource.getMe();
       return Right(userModel.toDomain());
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phone,
+    DateTime? dateOfBirth,
+  }) async {
+    try {
+      final userModel = await _remoteDataSource.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+        phone: phone,
+        dateOfBirth: dateOfBirth,
+      );
+      return Right(userModel.toDomain());
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> changePassword({
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _remoteDataSource.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      );
+      return const Right(unit);
     } on DioException catch (e) {
       return Left(_mapDioFailure(e));
     } catch (e) {

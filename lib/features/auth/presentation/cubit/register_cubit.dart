@@ -4,9 +4,8 @@ import '../../domain/usecases/register_use_case.dart';
 import 'register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
-  RegisterCubit({
-    required RegisterUseCase registerUseCase,
-  })  : _registerUseCase = registerUseCase,
+  RegisterCubit({required RegisterUseCase registerUseCase})
+      : _registerUseCase = registerUseCase,
         super(const RegisterState.initial());
 
   final RegisterUseCase _registerUseCase;
@@ -16,7 +15,10 @@ class RegisterCubit extends Cubit<RegisterState> {
     required String password,
     required String firstName,
     required String lastName,
-    required String level,
+    required String classLevel,
+    String? schoolId,
+    required String phone,
+    required DateTime dateOfBirth,
   }) async {
     emit(const RegisterState.loading());
     final result = await _registerUseCase(RegisterParams(
@@ -24,11 +26,17 @@ class RegisterCubit extends Cubit<RegisterState> {
       password: password,
       firstName: firstName,
       lastName: lastName,
-      level: level,
+      classLevel: classLevel,
+      schoolId: schoolId,
+      phone: phone,
+      dateOfBirth: dateOfBirth,
     ));
     result.fold(
       (failure) => emit(RegisterState.error(failure.message)),
-      (_) => emit(const RegisterState.success()),
+      (data) => emit(RegisterState.success(
+        email: data.email,
+        registrationStateToken: data.registrationStateToken,
+      )),
     );
   }
 }

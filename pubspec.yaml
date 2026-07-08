@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # State management
   flutter_bloc: ^8.1.6
@@ -41,6 +43,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
 
   cupertino_icons: ^1.0.8
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
