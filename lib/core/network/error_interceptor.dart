@@ -33,6 +33,11 @@ class ErrorInterceptor extends Interceptor {
       return AuthFailure(detail ?? 'Accès non autorisé.');
     }
 
+    if (statusCode == 404) {
+      final detail = _extractDetail(err);
+      return NotFoundFailure(detail ?? 'Ressource introuvable.');
+    }
+
     if (statusCode == 422) {
       final detail = _extractDetail(err);
       return ValidationFailure(detail ?? 'Données invalides.');

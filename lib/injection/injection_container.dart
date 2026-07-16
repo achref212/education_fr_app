@@ -43,6 +43,34 @@ import '../features/profile/presentation/cubit/change_password_cubit.dart';
 import '../features/profile/presentation/cubit/edit_profile_cubit.dart';
 import '../features/profile/presentation/cubit/profile_cubit.dart';
 import '../features/splash/presentation/cubit/splash_cubit.dart';
+import '../core/navigation/post_auth_navigator.dart';
+import '../features/parcours/data/datasources/parcours_remote_data_source.dart';
+import '../features/parcours/data/repositories/parcours_repository_impl.dart';
+import '../features/parcours/domain/repositories/parcours_repository.dart';
+import '../features/parcours/domain/usecases/complete_step_use_case.dart';
+import '../features/parcours/domain/usecases/get_parcours_summary_use_case.dart';
+import '../features/parcours/domain/usecases/get_parcours_use_case.dart';
+import '../features/parcours/domain/usecases/start_step_use_case.dart';
+import '../features/parcours/domain/usecases/update_difficulty_use_case.dart';
+import '../features/parcours/presentation/cubit/parcours_cubit.dart';
+import '../features/parcours/presentation/cubit/step_player_cubit.dart';
+import '../features/content/data/datasources/content_remote_data_source.dart';
+import '../features/content/data/repositories/content_repository_impl.dart';
+import '../features/content/domain/repositories/content_repository.dart';
+import '../features/content/domain/usecases/get_lesson_use_case.dart';
+import '../features/content/domain/usecases/get_quiz_questions_use_case.dart';
+import '../features/content/domain/usecases/get_story_use_case.dart';
+import '../features/delf_test/data/datasources/delf_test_remote_data_source.dart';
+import '../features/delf_test/data/repositories/delf_test_repository_impl.dart';
+import '../features/delf_test/domain/repositories/delf_test_repository.dart';
+import '../features/delf_test/domain/usecases/finish_delf_test_use_case.dart';
+import '../features/delf_test/domain/usecases/get_active_delf_test_use_case.dart';
+import '../features/delf_test/domain/usecases/get_delf_history_use_case.dart';
+import '../features/delf_test/domain/usecases/get_delf_results_use_case.dart';
+import '../features/delf_test/domain/usecases/start_delf_test_use_case.dart';
+import '../features/delf_test/domain/usecases/submit_delf_section_use_case.dart';
+import '../features/delf_test/presentation/cubit/delf_test_cubit.dart';
+import '../features/home/presentation/cubit/home_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -52,6 +80,10 @@ Future<void> initializeDependencies() async {
   _registerAuthFeature();
   _registerProfileFeature();
   _registerProgressFeature();
+  _registerParcoursFeature();
+  _registerContentFeature();
+  _registerDelfTestFeature();
+  _registerHomeFeature();
 }
 
 Future<void> _registerCore() async {
@@ -190,4 +222,100 @@ void _registerProgressFeature() {
       () => MarkLessonCompletedUseCase(sl<ProgressRepository>()));
   sl.registerFactory<AddQuizScoreUseCase>(
       () => AddQuizScoreUseCase(sl<ProgressRepository>()));
+}
+
+void _registerParcoursFeature() {
+  sl.registerLazySingleton<ParcoursRemoteDataSource>(
+    () => ParcoursRemoteDataSourceImpl(sl<Dio>()),
+  );
+  sl.registerLazySingleton<ParcoursRepository>(
+    () => ParcoursRepositoryImpl(remoteDataSource: sl<ParcoursRemoteDataSource>()),
+  );
+  sl.registerFactory<GetParcoursUseCase>(
+      () => GetParcoursUseCase(sl<ParcoursRepository>()));
+  sl.registerFactory<GetParcoursSummaryUseCase>(
+      () => GetParcoursSummaryUseCase(sl<ParcoursRepository>()));
+  sl.registerFactory<StartStepUseCase>(
+      () => StartStepUseCase(sl<ParcoursRepository>()));
+  sl.registerFactory<CompleteStepUseCase>(
+      () => CompleteStepUseCase(sl<ParcoursRepository>()));
+  sl.registerFactory<UpdateDifficultyUseCase>(
+      () => UpdateDifficultyUseCase(sl<ParcoursRepository>()));
+  sl.registerFactory<ParcoursCubit>(
+    () => ParcoursCubit(
+      getParcours: sl<GetParcoursUseCase>(),
+      updateDifficulty: sl<UpdateDifficultyUseCase>(),
+    ),
+  );
+  sl.registerFactory<StepPlayerCubit>(
+    () => StepPlayerCubit(
+      getParcours: sl<GetParcoursUseCase>(),
+      startStep: sl<StartStepUseCase>(),
+      completeStep: sl<CompleteStepUseCase>(),
+      getLesson: sl<GetLessonUseCase>(),
+      getQuizQuestions: sl<GetQuizQuestionsUseCase>(),
+      getStory: sl<GetStoryUseCase>(),
+    ),
+  );
+}
+
+void _registerContentFeature() {
+  sl.registerLazySingleton<ContentRemoteDataSource>(
+    () => ContentRemoteDataSourceImpl(sl<Dio>()),
+  );
+  sl.registerLazySingleton<ContentRepository>(
+    () => ContentRepositoryImpl(remoteDataSource: sl<ContentRemoteDataSource>()),
+  );
+  sl.registerFactory<GetLessonUseCase>(
+      () => GetLessonUseCase(sl<ContentRepository>()));
+  sl.registerFactory<GetQuizQuestionsUseCase>(
+      () => GetQuizQuestionsUseCase(sl<ContentRepository>()));
+  sl.registerFactory<GetStoryUseCase>(
+      () => GetStoryUseCase(sl<ContentRepository>()));
+}
+
+void _registerDelfTestFeature() {
+  sl.registerLazySingleton<DelfTestRemoteDataSource>(
+    () => DelfTestRemoteDataSourceImpl(sl<Dio>()),
+  );
+  sl.registerLazySingleton<DelfTestRepository>(
+    () => DelfTestRepositoryImpl(remoteDataSource: sl<DelfTestRemoteDataSource>()),
+  );
+  sl.registerFactory<StartDelfTestUseCase>(
+      () => StartDelfTestUseCase(sl<DelfTestRepository>()));
+  sl.registerFactory<GetActiveDelfTestUseCase>(
+      () => GetActiveDelfTestUseCase(sl<DelfTestRepository>()));
+  sl.registerFactory<GetDelfHistoryUseCase>(
+      () => GetDelfHistoryUseCase(sl<DelfTestRepository>()));
+  sl.registerFactory<SubmitDelfSectionUseCase>(
+      () => SubmitDelfSectionUseCase(sl<DelfTestRepository>()));
+  sl.registerFactory<FinishDelfTestUseCase>(
+      () => FinishDelfTestUseCase(sl<DelfTestRepository>()));
+  sl.registerFactory<GetDelfResultsUseCase>(
+      () => GetDelfResultsUseCase(sl<DelfTestRepository>()));
+  sl.registerLazySingleton<PostAuthNavigator>(
+    () => PostAuthNavigator(
+      getActiveDelfTest: sl<GetActiveDelfTestUseCase>(),
+      getDelfHistory: sl<GetDelfHistoryUseCase>(),
+    ),
+  );
+  sl.registerFactory<DelfTestCubit>(
+    () => DelfTestCubit(
+      startDelfTest: sl<StartDelfTestUseCase>(),
+      getActiveDelfTest: sl<GetActiveDelfTestUseCase>(),
+      submitDelfSection: sl<SubmitDelfSectionUseCase>(),
+      finishDelfTest: sl<FinishDelfTestUseCase>(),
+      getDelfResults: sl<GetDelfResultsUseCase>(),
+      getCurrentUser: sl<GetCurrentUserUseCase>(),
+    ),
+  );
+}
+
+void _registerHomeFeature() {
+  sl.registerFactory<HomeCubit>(
+    () => HomeCubit(
+      getParcoursSummary: sl<GetParcoursSummaryUseCase>(),
+      getParcours: sl<GetParcoursUseCase>(),
+    ),
+  );
 }

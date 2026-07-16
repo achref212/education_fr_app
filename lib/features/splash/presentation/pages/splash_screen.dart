@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/navigation/post_auth_navigator.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -32,10 +33,7 @@ class _SplashView extends StatelessWidget {
     return BlocListener<SplashCubit, SplashState>(
       listener: (context, state) {
         if (state is SplashAuthenticated) {
-          // TODO: replace with main app route once available
-          context.router.replace(const WelcomeRoute());
-        } else if (state is SplashAuthenticated) {
-          context.router.replace(const MainRoute());
+          navigateAfterAuth(context.router);
         } else if (state is SplashUnauthenticated) {
           if (state.hasSeenOnboarding) {
             context.router.replace(const WelcomeRoute());

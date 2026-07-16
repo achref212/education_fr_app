@@ -9,11 +9,16 @@ import '../../features/auth/presentation/pages/register_screen.dart';
 import '../../features/auth/presentation/pages/reset_password_screen.dart';
 import '../../features/auth/presentation/pages/verify_account_screen.dart';
 import '../../features/auth/presentation/pages/verify_reset_code_screen.dart';
+import '../../features/delf_test/presentation/pages/delf_intro_screen.dart';
+import '../../features/delf_test/presentation/pages/delf_question_screen.dart';
+import '../../features/delf_test/presentation/pages/delf_result_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/leaderboard/presentation/pages/leaderboard_screen.dart';
 import '../../features/main/presentation/pages/main_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/pages/welcome_screen.dart';
+import '../../features/parcours/presentation/pages/parcours_screen.dart';
+import '../../features/parcours/presentation/pages/step_player_screen.dart';
 import '../../features/profile/presentation/pages/change_password_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
@@ -36,6 +41,11 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: ResetPasswordRoute.page),
         AutoRoute(page: EditProfileRoute.page),
         AutoRoute(page: ChangePasswordRoute.page),
+        AutoRoute(page: DelfIntroRoute.page),
+        AutoRoute(page: DelfQuestionRoute.page),
+        AutoRoute(page: DelfResultRoute.page, path: '/delf-result/:sessionId'),
+        AutoRoute(page: ParcoursRoute.page),
+        AutoRoute(page: StepPlayerRoute.page, path: '/step/:stepId'),
         AutoRoute(
           page: MainRoute.page,
           children: [

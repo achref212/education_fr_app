@@ -32,3 +32,7 @@ class CacheFailure extends Failure {
 class ValidationFailure extends Failure {
   const ValidationFailure([super.message = 'Données invalides.']);
 }
+
+class NotFoundFailure extends Failure {
+  const NotFoundFailure([super.message = 'Ressource introuvable.']);
+}

@@ -34,4 +34,32 @@ class ApiConstants {
 
   // Progress
   static const String progress = '/progress';
+
+  // Parcours
+  static const String parcoursMe = '/parcours/me';
+  static const String parcoursSummary = '/parcours/me/summary';
+  static const String parcoursDifficulty = '/parcours/me/difficulty';
+  static String parcoursStepStart(String stepId) =>
+      '/parcours/steps/$stepId/start';
+  static String parcoursStepComplete(String stepId) =>
+      '/parcours/steps/$stepId/complete';
+
+  // Content
+  static const String lessons = '/lessons';
+  static String lesson(String id) => '/lessons/$id';
+  static const String quizQuestions = '/quiz-questions';
+  static const String stories = '/stories';
+  static String story(String id) => '/stories/$id';
+
+  // DELF tests
+  static const String delfTestsStart = '/delf-tests/start';
+  static const String delfTestsActive = '/delf-tests/me/active';
+  static const String delfTestsHistory = '/delf-tests/me/history';
+  static String delfTestSession(String id) => '/delf-tests/$id';
+  static String delfTestSectionSubmit(String sessionId, String category) =>
+      '/delf-tests/$sessionId/sections/$category/submit';
+  static String delfTestFinish(String sessionId) =>
+      '/delf-tests/$sessionId/finish';
+  static String delfTestResults(String sessionId) =>
+      '/delf-tests/$sessionId/results';
 }

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/presentation/widgets/app_button.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/auth_screen_shell.dart';
+import '../../../../core/navigation/post_auth_navigator.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
@@ -104,7 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: BlocConsumer<LoginCubit, LoginState>(
           listener: (context, state) {
             state.maybeWhen(
-              success: () => context.router.replaceAll([const MainRoute()]),
+              success: () => navigateAfterAuth(context.router),
               error: (message) {
                 final email = _emailController.text.trim();
                 if (message.toLowerCase().contains('désactivé') &&

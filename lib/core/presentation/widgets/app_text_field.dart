@@ -45,7 +45,7 @@ class _AppTextFieldState extends State<AppTextField> {
     final textColor =
         isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
     final surfaceColor =
-        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+        isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface;
     final hintColor =
         isDark ? AppColors.darkBodySecondary : AppColors.lightBodySecondary;
 
@@ -74,28 +74,30 @@ class _AppTextFieldState extends State<AppTextField> {
             hintStyle: AppTextStyles.bodyLarge.copyWith(color: hintColor),
             filled: true,
             fillColor: surfaceColor,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
-            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(
+                color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide.none,
+              borderRadius: BorderRadius.circular(18),
+              borderSide: BorderSide(
+                color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+              ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               borderSide: const BorderSide(color: AppColors.error, width: 2),
             ),
             suffixIcon: widget.obscureText

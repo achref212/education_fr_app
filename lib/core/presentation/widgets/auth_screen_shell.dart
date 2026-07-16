@@ -31,51 +31,103 @@ class AuthScreenShell extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: bgColor,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      resizeToAvoidBottomInset: true,
+      body: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        child: Stack(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Positioned(
+              top: -90,
+              right: -60,
+              child: _BackgroundOrb(
+                color:
+                    AppColors.primary.withValues(alpha: isDark ? 0.18 : 0.12),
+                size: 220,
+              ),
+            ),
+            Positioned(
+              bottom: 120,
+              left: -70,
+              child: _BackgroundOrb(
+                color: AppColors.accent.withValues(alpha: isDark ? 0.14 : 0.16),
+                size: 180,
+              ),
+            ),
+            SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  if (showBackButton)
-                    _AuthIconButton(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.of(context).maybePop(),
-                    )
-                  else
-                    const SizedBox(width: 40),
-                  _ThemeToggleButton(),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        if (showBackButton)
+                          _AuthIconButton(
+                            icon: Icons.arrow_back_ios_new_rounded,
+                            onTap: () => Navigator.of(context).maybePop(),
+                          )
+                        else
+                          const SizedBox(width: 44),
+                        _ThemeToggleButton(),
+                      ],
+                    ),
+                  ),
+                  if (title != null) ...[
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        title!,
+                        style: AppTextStyles.headlineMedium.copyWith(
+                          color: textColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        subtitle!,
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: subColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                  Expanded(child: child),
                 ],
               ),
             ),
-            if (title != null) ...[
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  title!,
-                  style: AppTextStyles.headlineMedium.copyWith(
-                    color: textColor,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-            if (subtitle != null) ...[
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  subtitle!,
-                  style: AppTextStyles.titleMedium.copyWith(color: subColor),
-                ),
-              ),
-            ],
-            Expanded(child: child),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BackgroundOrb extends StatelessWidget {
+  const _BackgroundOrb({
+    required this.color,
+    required this.size,
+  });
+
+  final Color color;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color,
         ),
       ),
     );
@@ -92,7 +144,7 @@ class _AuthIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surfaceColor =
-        isDark ? AppColors.darkSurface : AppColors.lightBackground;
+        isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface;
     final iconColor =
         isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
 
@@ -103,7 +155,10 @@ class _AuthIconButton extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: surfaceColor,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+          ),
         ),
         child: Icon(icon, size: 20, color: iconColor),
       ),
@@ -116,7 +171,7 @@ class _ThemeToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final surfaceColor =
-        isDark ? AppColors.darkSurface : AppColors.lightSurface;
+        isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface;
 
     return BlocBuilder<ThemeCubit, ThemeMode>(
       builder: (context, mode) {
@@ -127,7 +182,10 @@ class _ThemeToggleButton extends StatelessWidget {
             height: 40,
             decoration: BoxDecoration(
               color: surfaceColor,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+              ),
             ),
             child: Icon(
               isDark ? Icons.wb_sunny_rounded : Icons.nightlight_round,

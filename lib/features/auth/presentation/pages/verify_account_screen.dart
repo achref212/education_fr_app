@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/presentation/widgets/app_button.dart';
 import '../../../../core/presentation/widgets/auth_screen_shell.dart';
 import '../../../../core/presentation/widgets/otp_code_input.dart';
-import '../../../../core/router/app_router.dart';
+import '../../../../core/navigation/post_auth_navigator.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
@@ -52,8 +52,7 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
         child: BlocConsumer<VerifyAccountCubit, VerifyAccountState>(
           listener: (context, state) {
             state.maybeWhen(
-              success: () =>
-                  context.router.replaceAll([const MainRoute()]),
+              success: () => navigateAfterAuth(context.router),
               resendSuccess: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
@@ -79,7 +78,9 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
             return AuthScreenShell(
               title: 'Vérifiez votre compte',
               subtitle: 'Entrez le code à 6 chiffres envoyé à ${widget.email}',
-              child: Padding(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,8 +95,11 @@ class _VerifyAccountScreenState extends State<VerifyAccountScreen> {
                       ),
                       child: Column(
                         children: [
-                          Icon(Icons.mark_email_read_outlined,
-                              size: 48, color: AppColors.primary)
+                          const Icon(
+                            Icons.mark_email_read_outlined,
+                            size: 48,
+                            color: AppColors.primary,
+                          )
                               .animate()
                               .scale(
                                 begin: const Offset(0.8, 0.8),

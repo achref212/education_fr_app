@@ -27,6 +27,80 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [DelfIntroScreen]
+class DelfIntroRoute extends PageRouteInfo<void> {
+  const DelfIntroRoute({List<PageRouteInfo>? children})
+    : super(DelfIntroRoute.name, initialChildren: children);
+
+  static const String name = 'DelfIntroRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DelfIntroScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [DelfQuestionScreen]
+class DelfQuestionRoute extends PageRouteInfo<void> {
+  const DelfQuestionRoute({List<PageRouteInfo>? children})
+    : super(DelfQuestionRoute.name, initialChildren: children);
+
+  static const String name = 'DelfQuestionRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DelfQuestionScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [DelfResultScreen]
+class DelfResultRoute extends PageRouteInfo<DelfResultRouteArgs> {
+  DelfResultRoute({
+    Key? key,
+    required String sessionId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         DelfResultRoute.name,
+         args: DelfResultRouteArgs(key: key, sessionId: sessionId),
+         rawPathParams: {'sessionId': sessionId},
+         initialChildren: children,
+       );
+
+  static const String name = 'DelfResultRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<DelfResultRouteArgs>(
+        orElse: () =>
+            DelfResultRouteArgs(sessionId: pathParams.getString('sessionId')),
+      );
+      return DelfResultScreen(key: args.key, sessionId: args.sessionId);
+    },
+  );
+}
+
+class DelfResultRouteArgs {
+  const DelfResultRouteArgs({this.key, required this.sessionId});
+
+  final Key? key;
+
+  final String sessionId;
+
+  @override
+  String toString() {
+    return 'DelfResultRouteArgs{key: $key, sessionId: $sessionId}';
+  }
+}
+
+/// generated route for
 /// [EditProfileScreen]
 class EditProfileRoute extends PageRouteInfo<EditProfileRouteArgs> {
   EditProfileRoute({
@@ -160,6 +234,22 @@ class OnboardingRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [ParcoursScreen]
+class ParcoursRoute extends PageRouteInfo<void> {
+  const ParcoursRoute({List<PageRouteInfo>? children})
+    : super(ParcoursRoute.name, initialChildren: children);
+
+  static const String name = 'ParcoursRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ParcoursScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ProfileScreen]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})
@@ -257,6 +347,48 @@ class SplashRoute extends PageRouteInfo<void> {
       return const SplashScreen();
     },
   );
+}
+
+/// generated route for
+/// [StepPlayerScreen]
+class StepPlayerRoute extends PageRouteInfo<StepPlayerRouteArgs> {
+  StepPlayerRoute({
+    Key? key,
+    required String stepId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         StepPlayerRoute.name,
+         args: StepPlayerRouteArgs(key: key, stepId: stepId),
+         rawPathParams: {'stepId': stepId},
+         initialChildren: children,
+       );
+
+  static const String name = 'StepPlayerRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<StepPlayerRouteArgs>(
+        orElse: () =>
+            StepPlayerRouteArgs(stepId: pathParams.getString('stepId')),
+      );
+      return StepPlayerScreen(key: args.key, stepId: args.stepId);
+    },
+  );
+}
+
+class StepPlayerRouteArgs {
+  const StepPlayerRouteArgs({this.key, required this.stepId});
+
+  final Key? key;
+
+  final String stepId;
+
+  @override
+  String toString() {
+    return 'StepPlayerRouteArgs{key: $key, stepId: $stepId}';
+  }
 }
 
 /// generated route for

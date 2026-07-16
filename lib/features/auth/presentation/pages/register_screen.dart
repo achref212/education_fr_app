@@ -47,6 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isOtherSchool = false;
   List<School> _schools = [];
   bool _isLoadingSchools = true;
+  bool _showValidationErrors = false;
 
   @override
   void initState() {
@@ -103,7 +104,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: child!,
       ),
     );
-    if (picked != null) setState(() => _dateOfBirth = picked);
+    if (!mounted) return;
+    setState(() {
+      if (picked != null) _dateOfBirth = picked;
+    });
   }
 
   Future<void> _pickClassLevel() async {
@@ -114,7 +118,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           .map((l) => SelectionItem(id: l, label: l))
           .toList(),
     );
-    if (selected != null) setState(() => _classLevel = selected.id);
+    if (!mounted) return;
+    setState(() {
+      if (selected != null) _classLevel = selected.id;
+    });
   }
 
   Future<void> _pickSchool() async {
@@ -136,8 +143,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         subtitle: 'Continuer sans établissement associé',
       ),
     );
-    if (selected == null) return;
+    if (!mounted) return;
     setState(() {
+      if (selected == null) return;
       if (selected.id == AuthConstants.otherSchoolId) {
         _isOtherSchool = true;
         _schoolId = null;
@@ -170,26 +178,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return null;
   }
 
+  bool _isValidEmail(String value) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value);
+  }
+
   void _onRegisterPressed(BuildContext context) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    setState(() => _showValidationErrors = true);
+
     final birthdayError = _validateBirthday();
     final schoolError = _validateSchool();
     final classError = _validateClassLevel();
-    if (birthdayError != null || schoolError != null || classError != null) {
-      setState(() {});
+    final formIsValid = _formKey.currentState?.validate() ?? false;
+
+    if (!formIsValid ||
+        birthdayError != null ||
+        schoolError != null ||
+        classError != null) {
       return;
     }
-    if (_formKey.currentState!.validate()) {
-      context.read<RegisterCubit>().register(
-            email: _emailCtrl.text.trim(),
-            password: _passwordCtrl.text,
-            firstName: _firstNameCtrl.text.trim(),
-            lastName: _lastNameCtrl.text.trim(),
-            classLevel: _classLevel!,
-            schoolId: _schoolId,
-            phone: _phone,
-            dateOfBirth: _dateOfBirth!,
-          );
-    }
+
+    context.read<RegisterCubit>().register(
+          email: _emailCtrl.text.trim(),
+          password: _passwordCtrl.text,
+          firstName: _firstNameCtrl.text.trim(),
+          lastName: _lastNameCtrl.text.trim(),
+          classLevel: _classLevel!,
+          schoolId: _schoolId,
+          phone: _phone,
+          dateOfBirth: _dateOfBirth!,
+        );
   }
 
   @override
@@ -200,9 +218,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final subColor =
         isDark ? AppColors.darkBodySecondary : AppColors.lightBodySecondary;
     final surfColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
-    final birthdayError = _validateBirthday();
-    final schoolError = _validateSchool();
-    final classError = _validateClassLevel();
+    final birthdayError = _showValidationErrors ? _validateBirthday() : null;
+    final schoolError = _showValidationErrors ? _validateSchool() : null;
+    final classError = _showValidationErrors ? _validateClassLevel() : null;
 
     return BlocProvider.value(
       value: sl<ThemeCubit>(),
@@ -234,6 +252,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                 child: Form(
                   key: _formKey,
+                  autovalidateMode: _showValidationErrors
+                      ? AutovalidateMode.onUserInteraction
+                      : AutovalidateMode.disabled,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -248,7 +269,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 controller: _firstNameCtrl,
                                 textInputAction: TextInputAction.next,
                                 validator: (v) =>
-                                    (v == null || v.isEmpty) ? 'Requis' : null,
+                                    (v == null || v.trim().isEmpty)
+                                        ? 'Requis'
+                                        : null,
                               ),
                             ),
                             const SizedBox(width: 16),
@@ -259,7 +282,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 controller: _lastNameCtrl,
                                 textInputAction: TextInputAction.next,
                                 validator: (v) =>
-                                    (v == null || v.isEmpty) ? 'Requis' : null,
+                                    (v == null || v.trim().isEmpty)
+                                        ? 'Requis'
+                                        : null,
                               ),
                             ),
                           ],
@@ -321,7 +346,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 8),
                         Text(
                           'Votre établissement pourra être associé plus tard par votre professeur.',
-                          style: AppTextStyles.bodySmall.copyWith(color: subColor),
+                          style:
+                              AppTextStyles.bodySmall.copyWith(color: subColor),
                         ),
                       ],
                       const SizedBox(height: 16),
@@ -345,10 +371,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.next,
                           validator: (v) {
-                            if (v == null || v.isEmpty) {
+                            if (v == null || v.trim().isEmpty) {
                               return 'L\'e-mail est requis';
                             }
-                            if (!v.contains('@')) return 'E-mail invalide';
+                            if (!_isValidEmail(v.trim())) {
+                              return 'E-mail invalide';
+                            }
                             return null;
                           },
                         ),
@@ -379,7 +407,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: AppButton(
                           text: "S'inscrire",
                           isLoading: isLoading,
-                          onPressed: () => _onRegisterPressed(context),
+                          onPressed: isLoading
+                              ? null
+                              : () => _onRegisterPressed(context),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -388,8 +418,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         children: [
                           Text(
                             'Vous avez déjà un compte ?',
-                            style:
-                                AppTextStyles.bodyMedium.copyWith(color: textColor),
+                            style: AppTextStyles.bodyMedium
+                                .copyWith(color: textColor),
                           ),
                           TextButton(
                             onPressed: () =>
@@ -473,9 +503,7 @@ class _DatePickerField extends StatelessWidget {
               border: Border.all(
                 color: hasError
                     ? AppColors.error
-                    : (isDark
-                        ? AppColors.darkDivider
-                        : AppColors.lightDivider),
+                    : (isDark ? AppColors.darkDivider : AppColors.lightDivider),
               ),
             ),
             child: Row(
