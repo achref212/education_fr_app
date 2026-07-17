@@ -53,7 +53,7 @@ class DelfTestCubit extends Cubit<DelfTestState> {
             emit(
               DelfTestState.intro(
                 classLevel: user.classLevel ?? '6ème année',
-                targetDelfLevel: 'A1+',
+                targetDelfLevel: 'A2',
               ),
             );
           },
