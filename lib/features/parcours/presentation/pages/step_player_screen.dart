@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/presentation/widgets/app_button.dart';
+import '../../../../core/network/media_url.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
@@ -168,6 +169,7 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
     String content,
     String? audioUrl,
   ) {
+    final resolvedAudioUrl = resolveMediaUrl(audioUrl);
     return SafeArea(
       top: false,
       child: Padding(
@@ -181,7 +183,7 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
               title: title,
               color: AppColors.accentPurple,
             ),
-            if (audioUrl != null) ...[
+            if (resolvedAudioUrl.isNotEmpty) ...[
               const SizedBox(height: 12),
               Row(
                 children: [

@@ -18,6 +18,7 @@ class User with _$User {
     DateTime? dateOfBirth,
     String? classLevel,
     String? schoolId,
+    String? profilePictureUrl,
   }) = _User;
 
   const User._();

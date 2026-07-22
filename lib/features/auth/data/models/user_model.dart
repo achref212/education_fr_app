@@ -32,6 +32,7 @@ class UserModel {
     this.dateOfBirth,
     this.classLevel,
     this.schoolId,
+    this.profilePictureUrl,
   });
 
   final String id;
@@ -47,6 +48,7 @@ class UserModel {
   final DateTime? dateOfBirth;
   final String? classLevel;
   final String? schoolId;
+  final String? profilePictureUrl;
 
   factory UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
@@ -66,5 +68,6 @@ class UserModel {
         dateOfBirth: dateOfBirth,
         classLevel: classLevel,
         schoolId: schoolId,
+        profilePictureUrl: profilePictureUrl,
       );
 }

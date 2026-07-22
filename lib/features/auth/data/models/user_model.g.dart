@@ -19,6 +19,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       dateOfBirth: _dateFromJson(json['dateOfBirth'] as String?),
       classLevel: json['classLevel'] as String?,
       schoolId: json['schoolId'] as String?,
+      profilePictureUrl: json['profilePictureUrl'] as String?,
     );
 
 Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
@@ -34,4 +35,5 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'dateOfBirth': _dateToJson(instance.dateOfBirth),
       'classLevel': instance.classLevel,
       'schoolId': instance.schoolId,
+      'profilePictureUrl': instance.profilePictureUrl,
     };

@@ -28,6 +28,7 @@ mixin _$User {
   DateTime? get dateOfBirth => throw _privateConstructorUsedError;
   String? get classLevel => throw _privateConstructorUsedError;
   String? get schoolId => throw _privateConstructorUsedError;
+  String? get profilePictureUrl => throw _privateConstructorUsedError;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -52,7 +53,8 @@ abstract class $UserCopyWith<$Res> {
       String? phone,
       DateTime? dateOfBirth,
       String? classLevel,
-      String? schoolId});
+      String? schoolId,
+      String? profilePictureUrl});
 }
 
 /// @nodoc
@@ -82,6 +84,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? dateOfBirth = freezed,
     Object? classLevel = freezed,
     Object? schoolId = freezed,
+    Object? profilePictureUrl = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -132,6 +135,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.schoolId
           : schoolId // ignore: cast_nullable_to_non_nullable
               as String?,
+      profilePictureUrl: freezed == profilePictureUrl
+          ? _value.profilePictureUrl
+          : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -155,7 +162,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       String? phone,
       DateTime? dateOfBirth,
       String? classLevel,
-      String? schoolId});
+      String? schoolId,
+      String? profilePictureUrl});
 }
 
 /// @nodoc
@@ -182,6 +190,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? dateOfBirth = freezed,
     Object? classLevel = freezed,
     Object? schoolId = freezed,
+    Object? profilePictureUrl = freezed,
   }) {
     return _then(_$UserImpl(
       id: null == id
@@ -232,6 +241,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.schoolId
           : schoolId // ignore: cast_nullable_to_non_nullable
               as String?,
+      profilePictureUrl: freezed == profilePictureUrl
+          ? _value.profilePictureUrl
+          : profilePictureUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -251,7 +264,8 @@ class _$UserImpl extends _User {
       this.phone,
       this.dateOfBirth,
       this.classLevel,
-      this.schoolId})
+      this.schoolId,
+      this.profilePictureUrl})
       : super._();
 
   @override
@@ -280,10 +294,12 @@ class _$UserImpl extends _User {
   final String? classLevel;
   @override
   final String? schoolId;
+  @override
+  final String? profilePictureUrl;
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, level: $level, createdAt: $createdAt, role: $role, isActive: $isActive, phone: $phone, dateOfBirth: $dateOfBirth, classLevel: $classLevel, schoolId: $schoolId)';
+    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, level: $level, createdAt: $createdAt, role: $role, isActive: $isActive, phone: $phone, dateOfBirth: $dateOfBirth, classLevel: $classLevel, schoolId: $schoolId, profilePictureUrl: $profilePictureUrl)';
   }
 
   @override
@@ -309,7 +325,9 @@ class _$UserImpl extends _User {
             (identical(other.classLevel, classLevel) ||
                 other.classLevel == classLevel) &&
             (identical(other.schoolId, schoolId) ||
-                other.schoolId == schoolId));
+                other.schoolId == schoolId) &&
+            (identical(other.profilePictureUrl, profilePictureUrl) ||
+                other.profilePictureUrl == profilePictureUrl));
   }
 
   @override
@@ -326,7 +344,8 @@ class _$UserImpl extends _User {
       phone,
       dateOfBirth,
       classLevel,
-      schoolId);
+      schoolId,
+      profilePictureUrl);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -350,7 +369,8 @@ abstract class _User extends User {
       final String? phone,
       final DateTime? dateOfBirth,
       final String? classLevel,
-      final String? schoolId}) = _$UserImpl;
+      final String? schoolId,
+      final String? profilePictureUrl}) = _$UserImpl;
   const _User._() : super._();
 
   @override
@@ -377,6 +397,8 @@ abstract class _User extends User {
   String? get classLevel;
   @override
   String? get schoolId;
+  @override
+  String? get profilePictureUrl;
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
