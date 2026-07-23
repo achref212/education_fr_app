@@ -41,6 +41,7 @@ dependencies:
   # UI & Animations
   flutter_animate: ^4.5.0
   flutter_svg: ^2.0.10+1
+  image_picker: ^1.2.3
 
   cupertino_icons: ^1.0.8
   intl: ^0.20.2

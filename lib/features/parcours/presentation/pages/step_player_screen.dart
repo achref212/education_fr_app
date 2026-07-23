@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
 import '../../../content/domain/entities/quiz_question.dart';
+import '../../domain/usecases/complete_step_use_case.dart';
 import '../cubit/step_player_cubit.dart';
 import '../cubit/step_player_state.dart';
 import '../widgets/step_complete_sheet.dart';
@@ -302,7 +303,20 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
       if (selected == question.correctIndex) correct++;
     }
     final int score = ((correct / questions.length) * 100).round();
-    context.read<StepPlayerCubit>().completeStep(stepId: stepId, score: score);
+    final answers = questions
+        .where((QuizQuestion question) => _answers.containsKey(question.id))
+        .map(
+          (QuizQuestion question) => StepAnswer(
+            questionId: question.id,
+            selectedIndex: _answers[question.id]!,
+          ),
+        )
+        .toList();
+    context.read<StepPlayerCubit>().completeStep(
+          stepId: stepId,
+          score: score,
+          answers: answers,
+        );
   }
 }
 

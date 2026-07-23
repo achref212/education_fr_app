@@ -23,6 +23,14 @@ import '../../features/profile/presentation/pages/change_password_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/splash/presentation/pages/splash_screen.dart';
+import '../../features/student/presentation/pages/achievements_screen.dart';
+import '../../features/student/presentation/pages/delf_history_screen.dart';
+import '../../features/student/presentation/pages/delf_mock_exam_attempt_screen.dart';
+import '../../features/student/presentation/pages/delf_mock_exam_detail_screen.dart';
+import '../../features/student/presentation/pages/delf_mock_exam_list_screen.dart';
+import '../../features/student/presentation/pages/delf_mock_exam_result_screen.dart';
+import '../../features/student/presentation/pages/personalized_parcours_reveal_screen.dart';
+import '../../features/student/presentation/pages/review_center_screen.dart';
 
 part 'app_router.gr.dart';
 
@@ -44,12 +52,32 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: DelfIntroRoute.page),
         AutoRoute(page: DelfQuestionRoute.page),
         AutoRoute(page: DelfResultRoute.page, path: '/delf-result/:sessionId'),
-        AutoRoute(page: ParcoursRoute.page),
+        AutoRoute(
+          page: PersonalizedParcoursRevealRoute.page,
+          path: '/personalized-parcours/:sessionId',
+        ),
+        AutoRoute(page: AchievementsRoute.page),
+        AutoRoute(page: DelfHistoryRoute.page),
+        AutoRoute(page: DelfMockExamListRoute.page),
+        AutoRoute(
+          page: DelfMockExamDetailRoute.page,
+          path: '/delf-mock-exams/:examId',
+        ),
+        AutoRoute(
+          page: DelfMockExamAttemptRoute.page,
+          path: '/delf-mock-attempts/:attemptId',
+        ),
+        AutoRoute(
+          page: DelfMockExamResultRoute.page,
+          path: '/delf-mock-results/:attemptId',
+        ),
         AutoRoute(page: StepPlayerRoute.page, path: '/step/:stepId'),
         AutoRoute(
           page: MainRoute.page,
           children: [
             AutoRoute(page: HomeRoute.page, initial: true),
+            AutoRoute(page: ParcoursRoute.page),
+            AutoRoute(page: ReviewCenterRoute.page),
             AutoRoute(page: LeaderboardRoute.page),
             AutoRoute(page: ProfileRoute.page),
           ],

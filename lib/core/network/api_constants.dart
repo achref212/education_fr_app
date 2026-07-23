@@ -12,7 +12,7 @@ class ApiConstants {
     const definedUrl = String.fromEnvironment('API_BASE_URL', defaultValue: '');
     if (definedUrl.isNotEmpty) return definedUrl;
 
-    // We noticed you're using a physical device (Xiaomi). 
+    // We noticed you're using a physical device (Xiaomi).
     // Use your computer's local IP address instead of localhost or 10.0.2.2
     return 'http://192.168.100.21:8000';
   }
@@ -31,6 +31,8 @@ class ApiConstants {
   static const String login = '/auth/login';
   static const String me = '/auth/me';
   static const String changePassword = '/auth/change-password';
+  static const String profileUpload = '/assets/profile-upload';
+  static const String profileAvatarGenerate = '/assets/profile-avatar/generate';
 
   // Progress
   static const String progress = '/progress';
@@ -62,4 +64,23 @@ class ApiConstants {
       '/delf-tests/$sessionId/finish';
   static String delfTestResults(String sessionId) =>
       '/delf-tests/$sessionId/results';
+
+  // Student hub
+  static const String studentHub = '/student/me/hub';
+  static const String studentLeaderboard = '/student/me/leaderboard';
+  static const String studentAchievements = '/student/me/achievements';
+  static const String studentReview = '/student/me/review';
+  static String studentReviewComplete(String itemId) =>
+      '/student/me/review/$itemId/complete';
+  static String studentReviewHint(String itemId) =>
+      '/student/me/review/$itemId/hint';
+  static const String studentDelfMockExams = '/student/me/delf-mock-exams';
+  static String studentDelfMockExam(String examId) =>
+      '/student/me/delf-mock-exams/$examId';
+  static String studentDelfMockExamAttempts(String examId) =>
+      '/student/me/delf-mock-exams/$examId/attempts';
+  static String studentDelfMockAttempt(String attemptId) =>
+      '/student/me/delf-mock-attempts/$attemptId';
+  static String studentDelfMockAttemptSubmit(String attemptId) =>
+      '/student/me/delf-mock-attempts/$attemptId/submit';
 }

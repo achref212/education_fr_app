@@ -131,10 +131,14 @@ class StepPlayerCubit extends Cubit<StepPlayerState> {
     }
   }
 
-  Future<void> completeStep({required String stepId, required int score}) async {
+  Future<void> completeStep({
+    required String stepId,
+    required int score,
+    List<StepAnswer> answers = const <StepAnswer>[],
+  }) async {
     emit(const StepPlayerState.completing());
     final result = await _completeStep(
-      CompleteStepParams(stepId: stepId, score: score),
+      CompleteStepParams(stepId: stepId, score: score, answers: answers),
     );
     result.fold(
       (failure) => emit(StepPlayerState.error(failure.message)),

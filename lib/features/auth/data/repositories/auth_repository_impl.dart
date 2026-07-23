@@ -75,7 +75,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String?>> resendActivation({required String email}) async {
+  Future<Either<Failure, String?>> resendActivation(
+      {required String email}) async {
     try {
       final response = await _remoteDataSource.resendActivation(email: email);
       return Right(response.registrationStateToken);
@@ -87,7 +88,8 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, String?>> forgotPassword({required String email}) async {
+  Future<Either<Failure, String?>> forgotPassword(
+      {required String email}) async {
     try {
       final response = await _remoteDataSource.forgotPassword(email: email);
       return Right(response.resetStateToken);
@@ -190,6 +192,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? profilePictureUrl,
   }) async {
     try {
       final userModel = await _remoteDataSource.updateProfile(
@@ -197,8 +200,49 @@ class AuthRepositoryImpl implements AuthRepository {
         lastName: lastName,
         phone: phone,
         dateOfBirth: dateOfBirth,
+        profilePictureUrl: profilePictureUrl,
       );
       return Right(userModel.toDomain());
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadProfilePicture({
+    required List<int> bytes,
+    required String filename,
+    required String contentType,
+  }) async {
+    try {
+      final url = await _remoteDataSource.uploadProfilePicture(
+        bytes: bytes,
+        filename: filename,
+        contentType: contentType,
+      );
+      return Right(url);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> generateProfileAvatar({
+    required String style,
+    required Map<String, dynamic> customization,
+    String? prompt,
+  }) async {
+    try {
+      final url = await _remoteDataSource.generateProfileAvatar(
+        style: style,
+        customization: customization,
+        prompt: prompt,
+      );
+      return Right(url);
     } on DioException catch (e) {
       return Left(_mapDioFailure(e));
     } catch (e) {

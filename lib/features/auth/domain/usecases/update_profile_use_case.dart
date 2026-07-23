@@ -18,6 +18,7 @@ class UpdateProfileUseCase implements UseCase<User, UpdateProfileParams> {
         lastName: params.lastName,
         phone: params.phone,
         dateOfBirth: params.dateOfBirth,
+        profilePictureUrl: params.profilePictureUrl,
       );
 }
 
@@ -27,13 +28,21 @@ class UpdateProfileParams extends Equatable {
     this.lastName,
     this.phone,
     this.dateOfBirth,
+    this.profilePictureUrl,
   });
 
   final String? firstName;
   final String? lastName;
   final String? phone;
   final DateTime? dateOfBirth;
+  final String? profilePictureUrl;
 
   @override
-  List<Object?> get props => [firstName, lastName, phone, dateOfBirth];
+  List<Object?> get props => [
+        firstName,
+        lastName,
+        phone,
+        dateOfBirth,
+        profilePictureUrl,
+      ];
 }

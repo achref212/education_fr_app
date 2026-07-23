@@ -54,6 +54,19 @@ abstract class AuthRepository {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? profilePictureUrl,
+  });
+
+  Future<Either<Failure, String>> uploadProfilePicture({
+    required List<int> bytes,
+    required String filename,
+    required String contentType,
+  });
+
+  Future<Either<Failure, String>> generateProfileAvatar({
+    required String style,
+    required Map<String, dynamic> customization,
+    String? prompt,
   });
 
   Future<Either<Failure, Unit>> changePassword({

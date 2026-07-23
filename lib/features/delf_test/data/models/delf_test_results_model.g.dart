@@ -18,6 +18,9 @@ DelfTestResultsModel _$DelfTestResultsModelFromJson(
       achievedDelfLevel: json['achievedDelfLevel'] as String?,
       overallScore: (json['overallScore'] as num?)?.toInt(),
       finishedAt: json['finishedAt'] as String?,
+      assignedLearningPathId: json['assignedLearningPathId'] as String?,
+      parcoursGeneratedByAi: json['parcoursGeneratedByAi'] as bool?,
+      parcoursAssignmentStatus: json['parcoursAssignmentStatus'] as String?,
     );
 
 Map<String, dynamic> _$DelfTestResultsModelToJson(
@@ -32,4 +35,7 @@ Map<String, dynamic> _$DelfTestResultsModelToJson(
       'comparisonToTarget': instance.comparisonToTarget,
       'status': instance.status,
       'finishedAt': instance.finishedAt,
+      'assignedLearningPathId': instance.assignedLearningPathId,
+      'parcoursGeneratedByAi': instance.parcoursGeneratedByAi,
+      'parcoursAssignmentStatus': instance.parcoursAssignmentStatus,
     };

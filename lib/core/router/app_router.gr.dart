@@ -11,6 +11,22 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AchievementsScreen]
+class AchievementsRoute extends PageRouteInfo<void> {
+  const AchievementsRoute({List<PageRouteInfo>? children})
+    : super(AchievementsRoute.name, initialChildren: children);
+
+  static const String name = 'AchievementsRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const AchievementsScreen();
+    },
+  );
+}
+
+/// generated route for
 /// [ChangePasswordScreen]
 class ChangePasswordRoute extends PageRouteInfo<void> {
   const ChangePasswordRoute({List<PageRouteInfo>? children})
@@ -22,6 +38,22 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
     name,
     builder: (data) {
       return const ChangePasswordScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [DelfHistoryScreen]
+class DelfHistoryRoute extends PageRouteInfo<void> {
+  const DelfHistoryRoute({List<PageRouteInfo>? children})
+    : super(DelfHistoryRoute.name, initialChildren: children);
+
+  static const String name = 'DelfHistoryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DelfHistoryScreen();
     },
   );
 }
@@ -40,6 +72,156 @@ class DelfIntroRoute extends PageRouteInfo<void> {
       return const DelfIntroScreen();
     },
   );
+}
+
+/// generated route for
+/// [DelfMockExamAttemptScreen]
+class DelfMockExamAttemptRoute
+    extends PageRouteInfo<DelfMockExamAttemptRouteArgs> {
+  DelfMockExamAttemptRoute({
+    Key? key,
+    required String attemptId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         DelfMockExamAttemptRoute.name,
+         args: DelfMockExamAttemptRouteArgs(key: key, attemptId: attemptId),
+         rawPathParams: {'attemptId': attemptId},
+         initialChildren: children,
+       );
+
+  static const String name = 'DelfMockExamAttemptRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<DelfMockExamAttemptRouteArgs>(
+        orElse: () => DelfMockExamAttemptRouteArgs(
+          attemptId: pathParams.getString('attemptId'),
+        ),
+      );
+      return DelfMockExamAttemptScreen(
+        key: args.key,
+        attemptId: args.attemptId,
+      );
+    },
+  );
+}
+
+class DelfMockExamAttemptRouteArgs {
+  const DelfMockExamAttemptRouteArgs({this.key, required this.attemptId});
+
+  final Key? key;
+
+  final String attemptId;
+
+  @override
+  String toString() {
+    return 'DelfMockExamAttemptRouteArgs{key: $key, attemptId: $attemptId}';
+  }
+}
+
+/// generated route for
+/// [DelfMockExamDetailScreen]
+class DelfMockExamDetailRoute
+    extends PageRouteInfo<DelfMockExamDetailRouteArgs> {
+  DelfMockExamDetailRoute({
+    Key? key,
+    required String examId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         DelfMockExamDetailRoute.name,
+         args: DelfMockExamDetailRouteArgs(key: key, examId: examId),
+         rawPathParams: {'examId': examId},
+         initialChildren: children,
+       );
+
+  static const String name = 'DelfMockExamDetailRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<DelfMockExamDetailRouteArgs>(
+        orElse: () =>
+            DelfMockExamDetailRouteArgs(examId: pathParams.getString('examId')),
+      );
+      return DelfMockExamDetailScreen(key: args.key, examId: args.examId);
+    },
+  );
+}
+
+class DelfMockExamDetailRouteArgs {
+  const DelfMockExamDetailRouteArgs({this.key, required this.examId});
+
+  final Key? key;
+
+  final String examId;
+
+  @override
+  String toString() {
+    return 'DelfMockExamDetailRouteArgs{key: $key, examId: $examId}';
+  }
+}
+
+/// generated route for
+/// [DelfMockExamListScreen]
+class DelfMockExamListRoute extends PageRouteInfo<void> {
+  const DelfMockExamListRoute({List<PageRouteInfo>? children})
+    : super(DelfMockExamListRoute.name, initialChildren: children);
+
+  static const String name = 'DelfMockExamListRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const DelfMockExamListScreen();
+    },
+  );
+}
+
+/// generated route for
+/// [DelfMockExamResultScreen]
+class DelfMockExamResultRoute
+    extends PageRouteInfo<DelfMockExamResultRouteArgs> {
+  DelfMockExamResultRoute({
+    Key? key,
+    required String attemptId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         DelfMockExamResultRoute.name,
+         args: DelfMockExamResultRouteArgs(key: key, attemptId: attemptId),
+         rawPathParams: {'attemptId': attemptId},
+         initialChildren: children,
+       );
+
+  static const String name = 'DelfMockExamResultRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<DelfMockExamResultRouteArgs>(
+        orElse: () => DelfMockExamResultRouteArgs(
+          attemptId: pathParams.getString('attemptId'),
+        ),
+      );
+      return DelfMockExamResultScreen(key: args.key, attemptId: args.attemptId);
+    },
+  );
+}
+
+class DelfMockExamResultRouteArgs {
+  const DelfMockExamResultRouteArgs({this.key, required this.attemptId});
+
+  final Key? key;
+
+  final String attemptId;
+
+  @override
+  String toString() {
+    return 'DelfMockExamResultRouteArgs{key: $key, attemptId: $attemptId}';
+  }
 }
 
 /// generated route for
@@ -250,6 +432,59 @@ class ParcoursRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [PersonalizedParcoursRevealScreen]
+class PersonalizedParcoursRevealRoute
+    extends PageRouteInfo<PersonalizedParcoursRevealRouteArgs> {
+  PersonalizedParcoursRevealRoute({
+    Key? key,
+    required String sessionId,
+    List<PageRouteInfo>? children,
+  }) : super(
+         PersonalizedParcoursRevealRoute.name,
+         args: PersonalizedParcoursRevealRouteArgs(
+           key: key,
+           sessionId: sessionId,
+         ),
+         rawPathParams: {'sessionId': sessionId},
+         initialChildren: children,
+       );
+
+  static const String name = 'PersonalizedParcoursRevealRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final pathParams = data.inheritedPathParams;
+      final args = data.argsAs<PersonalizedParcoursRevealRouteArgs>(
+        orElse: () => PersonalizedParcoursRevealRouteArgs(
+          sessionId: pathParams.getString('sessionId'),
+        ),
+      );
+      return PersonalizedParcoursRevealScreen(
+        key: args.key,
+        sessionId: args.sessionId,
+      );
+    },
+  );
+}
+
+class PersonalizedParcoursRevealRouteArgs {
+  const PersonalizedParcoursRevealRouteArgs({
+    this.key,
+    required this.sessionId,
+  });
+
+  final Key? key;
+
+  final String sessionId;
+
+  @override
+  String toString() {
+    return 'PersonalizedParcoursRevealRouteArgs{key: $key, sessionId: $sessionId}';
+  }
+}
+
+/// generated route for
 /// [ProfileScreen]
 class ProfileRoute extends PageRouteInfo<void> {
   const ProfileRoute({List<PageRouteInfo>? children})
@@ -331,6 +566,22 @@ class ResetPasswordRouteArgs {
   String toString() {
     return 'ResetPasswordRouteArgs{key: $key, email: $email, resetToken: $resetToken}';
   }
+}
+
+/// generated route for
+/// [ReviewCenterScreen]
+class ReviewCenterRoute extends PageRouteInfo<void> {
+  const ReviewCenterRoute({List<PageRouteInfo>? children})
+    : super(ReviewCenterRoute.name, initialChildren: children);
+
+  static const String name = 'ReviewCenterRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const ReviewCenterScreen();
+    },
+  );
 }
 
 /// generated route for

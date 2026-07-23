@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/router/app_router.dart';
+import '../../../../core/network/media_url.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
@@ -14,6 +15,8 @@ import '../../../parcours/presentation/widgets/completion_ring.dart';
 import '../../../parcours/presentation/widgets/parcours_path_preview.dart';
 import '../../../parcours/presentation/widgets/streak_chip.dart';
 import '../../../parcours/presentation/widgets/xp_chip.dart';
+import '../../../student/data/datasources/student_remote_data_source.dart';
+import '../../../student/domain/entities/student_models.dart';
 import '../cubit/home_cubit.dart';
 import '../cubit/home_state.dart';
 
@@ -62,8 +65,10 @@ class _HomeView extends StatelessWidget {
                       parent: BouncingScrollPhysics(),
                     ),
                     children: [
-                      _buildHeader(
-                          context, summary.currentStreak, summary.totalXp),
+                      _HubHeader(
+                        fallbackStreak: summary.currentStreak,
+                        fallbackXp: summary.totalXp,
+                      ),
                       const SizedBox(height: 20),
                       _buildDailyGoalCard(context, summary),
                       const SizedBox(height: 16),
@@ -95,42 +100,6 @@ class _HomeView extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, int streak, int totalXp) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Bonjour 👋',
-              style: AppTextStyles.bodySmall.copyWith(
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.darkBodySecondary
-                    : AppColors.lightBodySecondary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Prêt à progresser ?',
-              style: AppTextStyles.titleLarge.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
-        ),
-        Row(
-          children: [
-            StreakChip(streak: streak),
-            const SizedBox(width: 8),
-            XpChip(totalXp: totalXp),
-          ],
-        ),
-      ],
     );
   }
 
@@ -310,7 +279,7 @@ class _HomeView extends StatelessWidget {
           ),
         ),
         TextButton(
-          onPressed: () => context.router.push(const ParcoursRoute()),
+          onPressed: () => AutoTabsRouter.of(context).setActiveIndex(1),
           child: const Text('Tout voir'),
         ),
       ],
@@ -326,7 +295,7 @@ class _HomeView extends StatelessWidget {
     final textColor =
         isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
     return InkWell(
-      onTap: () => context.router.push(const ParcoursRoute()),
+      onTap: () => AutoTabsRouter.of(context).setActiveIndex(1),
       borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.all(20),
@@ -374,26 +343,51 @@ class _HomeView extends StatelessWidget {
     return Column(
       children: [
         _ActivityTile(
+          title: 'Examen blanc',
+          subtitle: 'Passe un DELF complet et reçois un score estimé',
+          icon: Icons.assignment_rounded,
+          color: AppColors.primary,
+          onTap: () => context.router.push(const DelfMockExamListRoute()),
+        ),
+        const SizedBox(height: 12),
+        _ActivityTile(
+          title: 'Réviser mes erreurs',
+          subtitle: 'Cartes issues des quiz et tests DELF',
+          icon: Icons.psychology_alt_rounded,
+          color: AppColors.accentMint,
+          onTap: () => AutoTabsRouter.of(context).setActiveIndex(2),
+        ),
+        const SizedBox(height: 12),
+        _ActivityTile(
+          title: 'Historique DELF',
+          subtitle: 'Scores, tendances et détails',
+          icon: Icons.workspace_premium_rounded,
+          color: AppColors.accentPurple,
+          onTap: () => context.router.push(const DelfHistoryRoute()),
+        ),
+        const SizedBox(height: 12),
+        _ActivityTile(
+          title: 'Mes badges',
+          subtitle: 'Objectifs débloqués et prochains défis',
+          icon: Icons.military_tech_rounded,
+          color: AppColors.warning,
+          onTap: () => context.router.push(const AchievementsRoute()),
+        ),
+        const SizedBox(height: 12),
+        _ActivityTile(
+          title: 'Classement',
+          subtitle: 'Compare XP, série et progression',
+          icon: Icons.emoji_events_rounded,
+          color: AppColors.accentPink,
+          onTap: () => AutoTabsRouter.of(context).setActiveIndex(3),
+        ),
+        const SizedBox(height: 12),
+        _ActivityTile(
           title: 'Voir tout le parcours',
           subtitle: 'Explorez toutes vos étapes',
           icon: Icons.route_rounded,
           color: AppColors.primary,
-          onTap: () => context.router.push(const ParcoursRoute()),
-        ),
-        const SizedBox(height: 12),
-        const _ActivityTile(
-          title: 'Défi DELF',
-          subtitle: 'Préparez votre prochain test',
-          icon: Icons.workspace_premium_rounded,
-          color: AppColors.accentPurple,
-        ),
-        const SizedBox(height: 12),
-        const _ActivityTile(
-          title: 'Groupe de classe',
-          subtitle: 'Bientôt disponible',
-          icon: Icons.people_alt_rounded,
-          color: AppColors.accentPink,
-          isDisabled: true,
+          onTap: () => AutoTabsRouter.of(context).setActiveIndex(1),
         ),
       ],
     );
@@ -490,6 +484,90 @@ class _HomeView extends StatelessWidget {
   }
 }
 
+class _HubHeader extends StatelessWidget {
+  const _HubHeader({
+    required this.fallbackStreak,
+    required this.fallbackXp,
+  });
+
+  final int fallbackStreak;
+  final int fallbackXp;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<StudentHub>(
+      future: sl<StudentRemoteDataSource>().getHub(),
+      builder: (context, snapshot) {
+        final hub = snapshot.data;
+        final String? firstName = hub?.firstName;
+        final String avatarUrl = resolveMediaUrl(hub?.profilePictureUrl);
+        final int streak = hub?.currentStreak ?? fallbackStreak;
+        final int xp = hub?.totalXp ?? fallbackXp;
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.14),
+                    backgroundImage:
+                        avatarUrl.isEmpty ? null : NetworkImage(avatarUrl),
+                    child: avatarUrl.isEmpty
+                        ? const Icon(
+                            Icons.person_rounded,
+                            color: AppColors.primary,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          firstName == null || firstName.isEmpty
+                              ? 'Bonjour'
+                              : 'Bonjour $firstName',
+                          style: AppTextStyles.bodySmall.copyWith(
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? AppColors.darkBodySecondary
+                                    : AppColors.lightBodySecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          hub?.nextAction.title ?? 'Prêt à progresser ?',
+                          style: AppTextStyles.titleLarge.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Row(
+              children: [
+                StreakChip(streak: streak),
+                const SizedBox(width: 8),
+                XpChip(totalXp: xp),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
 class _ActivityTile extends StatelessWidget {
   const _ActivityTile({
     required this.title,
@@ -497,7 +575,6 @@ class _ActivityTile extends StatelessWidget {
     required this.icon,
     required this.color,
     this.onTap,
-    this.isDisabled = false,
   });
 
   final String title;
@@ -505,7 +582,6 @@ class _ActivityTile extends StatelessWidget {
   final IconData icon;
   final Color color;
   final VoidCallback? onTap;
-  final bool isDisabled;
 
   @override
   Widget build(BuildContext context) {
@@ -514,57 +590,54 @@ class _ActivityTile extends StatelessWidget {
         isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface;
     final textColor =
         isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
-    return Opacity(
-      opacity: isDisabled ? 0.6 : 1,
-      child: Container(
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.14 : 0.05),
-              blurRadius: 18,
-              offset: const Offset(0, 10),
-            ),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
         ),
-        child: ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          leading: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Icon(icon, color: color),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.14 : 0.05),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
           ),
-          title: Text(
-            title,
-            style: AppTextStyles.bodyLarge.copyWith(
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
+        ],
+      ),
+      child: ListTile(
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(16),
           ),
-          subtitle: Text(
-            subtitle,
-            style: AppTextStyles.bodySmall.copyWith(
-              color: isDark
-                  ? AppColors.darkBodySecondary
-                  : AppColors.lightBodySecondary,
-            ),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(
+          title,
+          style: AppTextStyles.bodyLarge.copyWith(
+            fontWeight: FontWeight.bold,
+            color: textColor,
           ),
-          trailing: Icon(
-            Icons.chevron_right_rounded,
+        ),
+        subtitle: Text(
+          subtitle,
+          style: AppTextStyles.bodySmall.copyWith(
             color: isDark
                 ? AppColors.darkBodySecondary
                 : AppColors.lightBodySecondary,
           ),
-          onTap: isDisabled ? null : onTap,
         ),
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          color: isDark
+              ? AppColors.darkBodySecondary
+              : AppColors.lightBodySecondary,
+        ),
+        onTap: onTap,
       ),
     );
   }

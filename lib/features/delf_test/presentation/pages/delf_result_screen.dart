@@ -357,7 +357,9 @@ class _ResultContent extends StatelessWidget {
           ),
           child: AppButton(
             text: 'Découvrir mon parcours',
-            onPressed: () => context.router.replaceAll([const MainRoute()]),
+            onPressed: () => context.router.replace(
+              PersonalizedParcoursRevealRoute(sessionId: results.sessionId),
+            ),
           ),
         ),
       ],

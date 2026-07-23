@@ -8,6 +8,7 @@ import '../features/auth/data/datasources/auth_remote_data_source.dart';
 import '../features/auth/data/repositories/auth_repository_impl.dart';
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/auth/domain/usecases/forgot_password_use_case.dart';
+import '../features/auth/domain/usecases/generate_profile_avatar_use_case.dart';
 import '../features/auth/domain/usecases/get_current_user_use_case.dart';
 import '../features/auth/domain/usecases/get_schools_use_case.dart';
 import '../features/auth/domain/usecases/login_use_case.dart';
@@ -15,6 +16,7 @@ import '../features/auth/domain/usecases/logout_use_case.dart';
 import '../features/auth/domain/usecases/register_use_case.dart';
 import '../features/auth/domain/usecases/resend_activation_use_case.dart';
 import '../features/auth/domain/usecases/reset_password_use_case.dart';
+import '../features/auth/domain/usecases/set_profile_picture_use_case.dart';
 import '../features/auth/domain/usecases/verify_registration_use_case.dart';
 import '../features/auth/domain/usecases/verify_reset_code_use_case.dart';
 import '../features/auth/domain/usecases/change_password_use_case.dart';
@@ -71,6 +73,7 @@ import '../features/delf_test/domain/usecases/start_delf_test_use_case.dart';
 import '../features/delf_test/domain/usecases/submit_delf_section_use_case.dart';
 import '../features/delf_test/presentation/cubit/delf_test_cubit.dart';
 import '../features/home/presentation/cubit/home_cubit.dart';
+import '../features/student/data/datasources/student_remote_data_source.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -83,6 +86,7 @@ Future<void> initializeDependencies() async {
   _registerParcoursFeature();
   _registerContentFeature();
   _registerDelfTestFeature();
+  _registerStudentFeature();
   _registerHomeFeature();
 }
 
@@ -166,7 +170,8 @@ void _registerAuthFeature() {
   );
 
   sl.registerFactory<ForgotPasswordCubit>(
-    () => ForgotPasswordCubit(forgotPasswordUseCase: sl<ForgotPasswordUseCase>()),
+    () =>
+        ForgotPasswordCubit(forgotPasswordUseCase: sl<ForgotPasswordUseCase>()),
   );
 
   sl.registerFactory<VerifyResetCodeCubit>(
@@ -181,6 +186,10 @@ void _registerAuthFeature() {
 
   sl.registerFactory<UpdateProfileUseCase>(
       () => UpdateProfileUseCase(sl<AuthRepository>()));
+  sl.registerFactory<SetProfilePictureUseCase>(
+      () => SetProfilePictureUseCase(sl<AuthRepository>()));
+  sl.registerFactory<GenerateProfileAvatarUseCase>(
+      () => GenerateProfileAvatarUseCase(sl<AuthRepository>()));
   sl.registerFactory<ChangePasswordUseCase>(
       () => ChangePasswordUseCase(sl<AuthRepository>()));
 }
@@ -196,7 +205,8 @@ void _registerProfileFeature() {
     () => EditProfileCubit(updateProfileUseCase: sl<UpdateProfileUseCase>()),
   );
   sl.registerFactory<ChangePasswordCubit>(
-    () => ChangePasswordCubit(changePasswordUseCase: sl<ChangePasswordUseCase>()),
+    () =>
+        ChangePasswordCubit(changePasswordUseCase: sl<ChangePasswordUseCase>()),
   );
 }
 
@@ -229,7 +239,8 @@ void _registerParcoursFeature() {
     () => ParcoursRemoteDataSourceImpl(sl<Dio>()),
   );
   sl.registerLazySingleton<ParcoursRepository>(
-    () => ParcoursRepositoryImpl(remoteDataSource: sl<ParcoursRemoteDataSource>()),
+    () => ParcoursRepositoryImpl(
+        remoteDataSource: sl<ParcoursRemoteDataSource>()),
   );
   sl.registerFactory<GetParcoursUseCase>(
       () => GetParcoursUseCase(sl<ParcoursRepository>()));
@@ -264,7 +275,8 @@ void _registerContentFeature() {
     () => ContentRemoteDataSourceImpl(sl<Dio>()),
   );
   sl.registerLazySingleton<ContentRepository>(
-    () => ContentRepositoryImpl(remoteDataSource: sl<ContentRemoteDataSource>()),
+    () =>
+        ContentRepositoryImpl(remoteDataSource: sl<ContentRemoteDataSource>()),
   );
   sl.registerFactory<GetLessonUseCase>(
       () => GetLessonUseCase(sl<ContentRepository>()));
@@ -279,7 +291,8 @@ void _registerDelfTestFeature() {
     () => DelfTestRemoteDataSourceImpl(sl<Dio>()),
   );
   sl.registerLazySingleton<DelfTestRepository>(
-    () => DelfTestRepositoryImpl(remoteDataSource: sl<DelfTestRemoteDataSource>()),
+    () => DelfTestRepositoryImpl(
+        remoteDataSource: sl<DelfTestRemoteDataSource>()),
   );
   sl.registerFactory<StartDelfTestUseCase>(
       () => StartDelfTestUseCase(sl<DelfTestRepository>()));
@@ -308,6 +321,12 @@ void _registerDelfTestFeature() {
       getDelfResults: sl<GetDelfResultsUseCase>(),
       getCurrentUser: sl<GetCurrentUserUseCase>(),
     ),
+  );
+}
+
+void _registerStudentFeature() {
+  sl.registerLazySingleton<StudentRemoteDataSource>(
+    () => StudentRemoteDataSourceImpl(sl<Dio>()),
   );
 }
 

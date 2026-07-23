@@ -6,6 +6,7 @@ import '../../domain/entities/parcours.dart';
 import '../../domain/entities/parcours_summary.dart';
 import '../../domain/entities/step_complete_result.dart';
 import '../../domain/repositories/parcours_repository.dart';
+import '../../domain/usecases/complete_step_use_case.dart';
 import '../datasources/parcours_remote_data_source.dart';
 
 class ParcoursRepositoryImpl implements ParcoursRepository {
@@ -48,11 +49,13 @@ class ParcoursRepositoryImpl implements ParcoursRepository {
   Future<Either<Failure, StepCompleteResult>> completeStep({
     required String stepId,
     required int score,
+    List<StepAnswer> answers = const <StepAnswer>[],
   }) async {
     try {
       final model = await _remoteDataSource.completeStep(
         stepId: stepId,
         score: score,
+        answers: answers,
       );
       return Right(model.toDomain());
     } on DioException catch (e) {

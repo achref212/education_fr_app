@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_constants.dart';
+import '../../domain/usecases/complete_step_use_case.dart';
 import '../models/parcours_model.dart';
 import '../models/parcours_summary_model.dart';
 import '../models/step_complete_result_model.dart';
@@ -12,6 +13,7 @@ abstract class ParcoursRemoteDataSource {
   Future<StepCompleteResultModel> completeStep({
     required String stepId,
     required int score,
+    List<StepAnswer> answers,
   });
   Future<void> updateDifficulty(String difficulty);
 }
@@ -44,10 +46,16 @@ class ParcoursRemoteDataSourceImpl implements ParcoursRemoteDataSource {
   Future<StepCompleteResultModel> completeStep({
     required String stepId,
     required int score,
+    List<StepAnswer> answers = const <StepAnswer>[],
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       ApiConstants.parcoursStepComplete(stepId),
-      data: <String, int>{'score': score},
+      data: <String, dynamic>{
+        'score': score,
+        if (answers.isNotEmpty)
+          'answers':
+              answers.map((StepAnswer answer) => answer.toJson()).toList(),
+      },
     );
     return StepCompleteResultModel.fromJson(response.data!);
   }

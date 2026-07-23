@@ -16,6 +16,9 @@ class DelfTestResultsModel {
     this.achievedDelfLevel,
     this.overallScore,
     this.finishedAt,
+    this.assignedLearningPathId,
+    this.parcoursGeneratedByAi,
+    this.parcoursAssignmentStatus,
   });
 
   final String sessionId;
@@ -27,6 +30,9 @@ class DelfTestResultsModel {
   final String comparisonToTarget;
   final String status;
   final String? finishedAt;
+  final String? assignedLearningPathId;
+  final bool? parcoursGeneratedByAi;
+  final String? parcoursAssignmentStatus;
 
   factory DelfTestResultsModel.fromJson(Map<String, dynamic> json) =>
       _$DelfTestResultsModelFromJson(json);
@@ -43,5 +49,8 @@ class DelfTestResultsModel {
         comparisonToTarget: comparisonToTarget,
         status: status,
         finishedAt: finishedAt,
+        assignedLearningPathId: assignedLearningPathId,
+        parcoursGeneratedByAi: parcoursGeneratedByAi,
+        parcoursAssignmentStatus: parcoursAssignmentStatus,
       );
 }

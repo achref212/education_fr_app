@@ -11,6 +11,9 @@ class DelfTestResults extends Equatable {
     this.achievedDelfLevel,
     this.overallScore,
     this.finishedAt,
+    this.assignedLearningPathId,
+    this.parcoursGeneratedByAi,
+    this.parcoursAssignmentStatus,
   });
 
   final String sessionId;
@@ -22,6 +25,9 @@ class DelfTestResults extends Equatable {
   final String comparisonToTarget;
   final String status;
   final String? finishedAt;
+  final String? assignedLearningPathId;
+  final bool? parcoursGeneratedByAi;
+  final String? parcoursAssignmentStatus;
 
   @override
   List<Object?> get props => [
@@ -34,5 +40,8 @@ class DelfTestResults extends Equatable {
         comparisonToTarget,
         status,
         finishedAt,
+        assignedLearningPathId,
+        parcoursGeneratedByAi,
+        parcoursAssignmentStatus,
       ];
 }

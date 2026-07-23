@@ -61,6 +61,19 @@ abstract class AuthRemoteDataSource {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? profilePictureUrl,
+  });
+
+  Future<String> uploadProfilePicture({
+    required List<int> bytes,
+    required String filename,
+    required String contentType,
+  });
+
+  Future<String> generateProfileAvatar({
+    required String style,
+    required Map<String, dynamic> customization,
+    String? prompt,
   });
 
   Future<void> changePassword({
@@ -206,6 +219,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? profilePictureUrl,
   }) async {
     final response = await _dio.patch<Map<String, dynamic>>(
       ApiConstants.me,
@@ -214,9 +228,46 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (lastName != null) 'lastName': lastName,
         if (phone != null) 'phone': phone,
         if (dateOfBirth != null) 'dateOfBirth': _formatDate(dateOfBirth),
+        if (profilePictureUrl != null) 'profilePictureUrl': profilePictureUrl,
       },
     );
     return UserModel.fromJson(response.data!);
+  }
+
+  @override
+  Future<String> uploadProfilePicture({
+    required List<int> bytes,
+    required String filename,
+    required String contentType,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiConstants.profileUpload,
+      data: FormData.fromMap({
+        'file': MultipartFile.fromBytes(
+          bytes,
+          filename: filename,
+          contentType: DioMediaType.parse(contentType),
+        ),
+      }),
+    );
+    return response.data!['url'] as String;
+  }
+
+  @override
+  Future<String> generateProfileAvatar({
+    required String style,
+    required Map<String, dynamic> customization,
+    String? prompt,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiConstants.profileAvatarGenerate,
+      data: {
+        'style': style,
+        'customization': customization,
+        if (prompt != null && prompt.trim().isNotEmpty) 'prompt': prompt.trim(),
+      },
+    );
+    return response.data!['url'] as String;
   }
 
   @override

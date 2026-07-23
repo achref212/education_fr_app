@@ -15,6 +15,7 @@ import '../../../auth/domain/usecases/logout_use_case.dart';
 import '../../../theme/presentation/cubit/theme_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
+import '../widgets/profile_picture_actions.dart';
 import '../widgets/profile_widgets.dart';
 
 @RoutePage()
@@ -120,6 +121,7 @@ class _ProfileContent extends StatelessWidget {
                       _AvatarBadge(
                         initials: user.initials,
                         imageUrl: user.profilePictureUrl,
+                        onTap: () => _changeProfilePicture(context, user),
                       )
                           .animate()
                           .scale(
@@ -186,9 +188,7 @@ class _ProfileContent extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
                   ),
-                )
-                    .animate(delay: 100.ms)
-                    .fadeIn(duration: 400.ms),
+                ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
                 const SizedBox(height: 10),
                 ProfileSectionCard(
                   children: [
@@ -301,50 +301,89 @@ class _ProfileContent extends StatelessWidget {
       context.router.replaceAll([const SplashRoute()]);
     }
   }
+
+  Future<void> _changeProfilePicture(BuildContext context, User user) async {
+    final updated = await showProfilePictureActions(
+      context: context,
+      user: user,
+    );
+    if (updated != null && context.mounted) {
+      context.read<ProfileCubit>().loadProfile();
+    }
+  }
 }
 
 class _AvatarBadge extends StatelessWidget {
   const _AvatarBadge({
     required this.initials,
     this.imageUrl,
+    this.onTap,
   });
 
   final String initials;
   final String? imageUrl;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final resolvedImageUrl = resolveMediaUrl(imageUrl);
-    return Container(
-      width: 88,
-      height: 88,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [AppColors.primary, AppColors.primaryDark],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.35),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 88,
+            height: 88,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.primary, AppColors.primaryDark],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: 0.35),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            alignment: Alignment.center,
+            child: resolvedImageUrl.isNotEmpty
+                ? ClipOval(
+                    child: Image.network(
+                      resolvedImageUrl,
+                      width: 88,
+                      height: 88,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) =>
+                          _InitialsText(initials: initials),
+                    ),
+                  )
+                : _InitialsText(initials: initials),
+          ),
+          Positioned(
+            right: -2,
+            bottom: 2,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: AppColors.accent,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.onPrimary, width: 2),
+              ),
+              child: const Icon(
+                Icons.camera_alt_rounded,
+                size: 16,
+                color: AppColors.lightBodyPrimary,
+              ),
+            ),
           ),
         ],
       ),
-      alignment: Alignment.center,
-      child: resolvedImageUrl.isNotEmpty
-          ? ClipOval(
-              child: Image.network(
-                resolvedImageUrl,
-                width: 88,
-                height: 88,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _InitialsText(initials: initials),
-              ),
-            )
-          : _InitialsText(initials: initials),
     );
   }
 }

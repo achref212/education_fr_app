@@ -15,6 +15,8 @@ class MainScreen extends StatelessWidget {
     return AutoTabsScaffold(
       routes: const [
         HomeRoute(),
+        ParcoursRoute(),
+        ReviewCenterRoute(),
         LeaderboardRoute(),
         ProfileRoute(),
       ],
@@ -52,6 +54,16 @@ class MainScreen extends StatelessWidget {
                       icon: Icon(Icons.home_outlined),
                       selectedIcon: Icon(Icons.home_rounded),
                       label: 'Accueil',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.route_outlined),
+                      selectedIcon: Icon(Icons.route_rounded),
+                      label: 'Parcours',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.psychology_alt_outlined),
+                      selectedIcon: Icon(Icons.psychology_alt_rounded),
+                      label: 'Réviser',
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.emoji_events_outlined),
