@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../core/error/failures.dart';
 import '../entities/register_result.dart';
+import '../entities/profile_image_asset.dart';
 import '../entities/school.dart';
 import '../entities/user.dart';
 
@@ -63,10 +64,15 @@ abstract class AuthRepository {
     required String contentType,
   });
 
+  Future<Either<Failure, List<ProfileImageAsset>>> listProfileImages();
+
   Future<Either<Failure, String>> generateProfileAvatar({
     required String style,
     required Map<String, dynamic> customization,
     String? prompt,
+    List<int>? selfieBytes,
+    String? selfieFilename,
+    String? selfieContentType,
   });
 
   Future<Either<Failure, Unit>> changePassword({

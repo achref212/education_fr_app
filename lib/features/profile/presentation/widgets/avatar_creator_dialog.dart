@@ -3,22 +3,30 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/presentation/widgets/app_button.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import 'avatar_preview.dart';
+import 'profile_image_adjust_dialog.dart';
 
 class AvatarCreationResult {
   const AvatarCreationResult.local({
     required this.bytes,
     required this.customization,
   })  : useAi = false,
-        prompt = null;
+        prompt = null,
+        selfieBytes = null,
+        selfieFilename = null,
+        selfieContentType = null;
 
   const AvatarCreationResult.ai({
     required this.customization,
     this.prompt,
+    this.selfieBytes,
+    this.selfieFilename,
+    this.selfieContentType,
   })  : useAi = true,
         bytes = null;
 
@@ -26,6 +34,9 @@ class AvatarCreationResult {
   final Uint8List? bytes;
   final AvatarCustomization customization;
   final String? prompt;
+  final Uint8List? selfieBytes;
+  final String? selfieFilename;
+  final String? selfieContentType;
 }
 
 Future<AvatarCreationResult?> showAvatarCreatorDialog(
@@ -52,6 +63,9 @@ class _AvatarCreatorDialogState extends State<_AvatarCreatorDialog> {
   final _promptController = TextEditingController();
   AvatarCustomization _avatar =
       AvatarCustomization.defaults(AvatarStyle.friendlySchool);
+  Uint8List? _selfieBytes;
+  String? _selfieFilename;
+  String? _selfieContentType;
   bool _isExporting = false;
 
   @override
@@ -63,15 +77,10 @@ class _AvatarCreatorDialogState extends State<_AvatarCreatorDialog> {
   Future<void> _saveLocal() async {
     setState(() => _isExporting = true);
     try {
-      final boundary = _previewKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
-      final image = await boundary?.toImage(pixelRatio: 3);
-      final bytes = await image
-          ?.toByteData(format: ui.ImageByteFormat.png)
-          .then((value) => value?.buffer.asUint8List());
+      final bytes = await _exportPreviewBytes();
       if (!mounted) return;
       if (bytes == null || bytes.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
           const SnackBar(
             content: Text('Impossible de préparer cet avatar.'),
             backgroundColor: AppColors.error,
@@ -94,8 +103,43 @@ class _AvatarCreatorDialogState extends State<_AvatarCreatorDialog> {
       AvatarCreationResult.ai(
         customization: _avatar,
         prompt: _promptController.text.trim(),
+        selfieBytes: _selfieBytes,
+        selfieFilename: _selfieFilename,
+        selfieContentType: _selfieContentType,
       ),
     );
+  }
+
+  Future<void> _pickSelfie() async {
+    final picker = ImagePicker();
+    final image = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 88,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    );
+    if (image == null) return;
+    final bytes = await image.readAsBytes();
+    if (!mounted) return;
+    final adjusted = await showProfileImageAdjustDialog(
+      context: context,
+      bytes: bytes,
+    );
+    if (adjusted == null || !mounted) return;
+    setState(() {
+      _selfieBytes = adjusted;
+      _selfieFilename = 'selfie-avatar-source.png';
+      _selfieContentType = 'image/png';
+    });
+  }
+
+  Future<Uint8List?> _exportPreviewBytes() async {
+    final boundary = _previewKey.currentContext?.findRenderObject()
+        as RenderRepaintBoundary?;
+    final image = await boundary?.toImage(pixelRatio: 3);
+    return image
+        ?.toByteData(format: ui.ImageByteFormat.png)
+        .then((value) => value?.buffer.asUint8List());
   }
 
   @override
@@ -162,9 +206,16 @@ class _AvatarCreatorDialogState extends State<_AvatarCreatorDialog> {
                 onSelected: (style) {
                   setState(() {
                     _avatar = AvatarCustomization.defaults(style)
-                        .copyWith(style: style);
+                        .copyWith(style: style, gender: _avatar.gender);
                   });
                 },
+              ),
+              const SizedBox(height: 14),
+              _GenderSelector(
+                selected: _avatar.gender,
+                onSelected: (gender) => setState(
+                  () => _avatar = _avatar.copyWith(gender: gender),
+                ),
               ),
               const SizedBox(height: 18),
               _SwatchControl(
@@ -311,6 +362,17 @@ class _AvatarCreatorDialogState extends State<_AvatarCreatorDialog> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              const SizedBox(height: 12),
+              _SelfiePicker(
+                bytes: _selfieBytes,
+                filename: _selfieFilename,
+                onPick: _pickSelfie,
+                onRemove: () => setState(() {
+                  _selfieBytes = null;
+                  _selfieFilename = null;
+                  _selfieContentType = null;
+                }),
+              ),
               const SizedBox(height: 18),
               AppButton(
                 text: 'Enregistrer cet avatar',
@@ -319,7 +381,7 @@ class _AvatarCreatorDialogState extends State<_AvatarCreatorDialog> {
               ),
               const SizedBox(height: 10),
               OutlinedButton.icon(
-                onPressed: _generateAi,
+                onPressed: _isExporting ? null : _generateAi,
                 icon: const Icon(Icons.auto_awesome_rounded),
                 label: const Text('Générer une version IA'),
               ),
@@ -355,6 +417,106 @@ class _StyleSelector extends StatelessWidget {
           if (style != AvatarStyle.values.last) const SizedBox(width: 10),
         ],
       ],
+    );
+  }
+}
+
+class _GenderSelector extends StatelessWidget {
+  const _GenderSelector({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final AvatarGender selected;
+  final ValueChanged<AvatarGender> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: AvatarGender.values
+          .map(
+            (gender) => ChoiceChip(
+              selected: selected == gender,
+              label: Text(gender.label),
+              avatar: Icon(
+                switch (gender) {
+                  AvatarGender.girl => Icons.face_3_rounded,
+                  AvatarGender.boy => Icons.face_6_rounded,
+                  AvatarGender.neutral => Icons.face_rounded,
+                },
+                size: 18,
+              ),
+              onSelected: (_) => onSelected(gender),
+            ),
+          )
+          .toList(),
+    );
+  }
+}
+
+class _SelfiePicker extends StatelessWidget {
+  const _SelfiePicker({
+    required this.bytes,
+    required this.filename,
+    required this.onPick,
+    required this.onRemove,
+  });
+
+  final Uint8List? bytes;
+  final String? filename;
+  final VoidCallback onPick;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasSelfie = bytes != null && bytes!.isNotEmpty;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? AppColors.darkDivider : AppColors.lightDivider;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: 56,
+              height: 56,
+              child: hasSelfie
+                  ? Image.memory(bytes!, fit: BoxFit.cover)
+                  : const ColoredBox(
+                      color: Color(0xFFEAF0F6),
+                      child: Icon(Icons.person_search_rounded),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              hasSelfie ? filename ?? 'Selfie importé' : 'Selfie IA',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTextStyles.bodyMedium.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          IconButton(
+            tooltip: hasSelfie ? 'Retirer' : 'Importer un selfie',
+            onPressed: hasSelfie ? onRemove : onPick,
+            icon: Icon(
+              hasSelfie
+                  ? Icons.close_rounded
+                  : Icons.add_photo_alternate_rounded,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

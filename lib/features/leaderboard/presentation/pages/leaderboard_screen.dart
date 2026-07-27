@@ -1,10 +1,10 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/network/media_url.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
+import '../../../profile/presentation/widgets/circular_profile_avatar.dart';
 import '../../../student/data/datasources/student_remote_data_source.dart';
 import '../../../student/domain/entities/student_models.dart';
 
@@ -118,7 +118,15 @@ class _RankHero extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _Avatar(url: entry.profilePictureUrl, size: 56),
+          CircularProfileAvatar(
+            imageUrl: entry.profilePictureUrl,
+            initials: entry.firstName.isEmpty
+                ? null
+                : entry.firstName.substring(0, 1).toUpperCase(),
+            size: 56,
+            backgroundColor: Colors.white.withValues(alpha: 0.18),
+            foregroundColor: Colors.white,
+          ),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -186,7 +194,13 @@ class _LeaderboardTile extends StatelessWidget {
               ),
             ),
           ),
-          _Avatar(url: entry.profilePictureUrl, size: 44),
+          CircularProfileAvatar(
+            imageUrl: entry.profilePictureUrl,
+            initials: entry.firstName.isEmpty
+                ? null
+                : entry.firstName.substring(0, 1).toUpperCase(),
+            size: 44,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -221,26 +235,6 @@ class _LeaderboardTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar({required this.url, required this.size});
-
-  final String? url;
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    final resolved = resolveMediaUrl(url);
-    return CircleAvatar(
-      radius: size / 2,
-      backgroundColor: AppColors.primary.withValues(alpha: 0.14),
-      backgroundImage: resolved.isEmpty ? null : NetworkImage(resolved),
-      child: resolved.isEmpty
-          ? const Icon(Icons.person_rounded, color: AppColors.primary)
-          : null,
     );
   }
 }

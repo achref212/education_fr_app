@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/router/app_router.dart';
-import '../../../../core/network/media_url.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/usecase/usecase.dart';
@@ -15,6 +14,7 @@ import '../../../auth/domain/usecases/logout_use_case.dart';
 import '../../../theme/presentation/cubit/theme_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
+import '../widgets/circular_profile_avatar.dart';
 import '../widgets/profile_picture_actions.dart';
 import '../widgets/profile_widgets.dart';
 
@@ -121,7 +121,7 @@ class _ProfileContent extends StatelessWidget {
                       _AvatarBadge(
                         initials: user.initials,
                         imageUrl: user.profilePictureUrl,
-                        onTap: () => _changeProfilePicture(context, user),
+                        onTap: () => _changeProfilePicture(context),
                       )
                           .animate()
                           .scale(
@@ -302,7 +302,7 @@ class _ProfileContent extends StatelessWidget {
     }
   }
 
-  Future<void> _changeProfilePicture(BuildContext context, User user) async {
+  Future<void> _changeProfilePicture(BuildContext context) async {
     final updated = await showProfilePictureActions(
       context: context,
       user: user,
@@ -326,7 +326,6 @@ class _AvatarBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedImageUrl = resolveMediaUrl(imageUrl);
     return GestureDetector(
       onTap: onTap,
       child: Stack(
@@ -351,18 +350,13 @@ class _AvatarBadge extends StatelessWidget {
               ],
             ),
             alignment: Alignment.center,
-            child: resolvedImageUrl.isNotEmpty
-                ? ClipOval(
-                    child: Image.network(
-                      resolvedImageUrl,
-                      width: 88,
-                      height: 88,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) =>
-                          _InitialsText(initials: initials),
-                    ),
-                  )
-                : _InitialsText(initials: initials),
+            child: CircularProfileAvatar(
+              imageUrl: imageUrl,
+              initials: initials,
+              size: 88,
+              backgroundColor: Colors.transparent,
+              foregroundColor: AppColors.onPrimary,
+            ),
           ),
           Positioned(
             right: -2,
@@ -383,23 +377,6 @@ class _AvatarBadge extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _InitialsText extends StatelessWidget {
-  const _InitialsText({required this.initials});
-
-  final String initials;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      initials,
-      style: AppTextStyles.headlineMedium.copyWith(
-        color: AppColors.onPrimary,
-        fontWeight: FontWeight.w700,
       ),
     );
   }

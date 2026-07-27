@@ -13,6 +13,7 @@ import '../features/auth/domain/usecases/get_current_user_use_case.dart';
 import '../features/auth/domain/usecases/get_schools_use_case.dart';
 import '../features/auth/domain/usecases/login_use_case.dart';
 import '../features/auth/domain/usecases/logout_use_case.dart';
+import '../features/auth/domain/usecases/list_profile_images_use_case.dart';
 import '../features/auth/domain/usecases/register_use_case.dart';
 import '../features/auth/domain/usecases/resend_activation_use_case.dart';
 import '../features/auth/domain/usecases/reset_password_use_case.dart';
@@ -188,8 +189,12 @@ void _registerAuthFeature() {
       () => UpdateProfileUseCase(sl<AuthRepository>()));
   sl.registerFactory<SetProfilePictureUseCase>(
       () => SetProfilePictureUseCase(sl<AuthRepository>()));
+  sl.registerFactory<ListProfileImagesUseCase>(
+      () => ListProfileImagesUseCase(sl<AuthRepository>()));
   sl.registerFactory<GenerateProfileAvatarUseCase>(
       () => GenerateProfileAvatarUseCase(sl<AuthRepository>()));
+  sl.registerFactory<GenerateProfileAvatarAssetUseCase>(
+      () => GenerateProfileAvatarAssetUseCase(sl<AuthRepository>()));
   sl.registerFactory<ChangePasswordUseCase>(
       () => ChangePasswordUseCase(sl<AuthRepository>()));
 }
@@ -316,6 +321,7 @@ void _registerDelfTestFeature() {
     () => DelfTestCubit(
       startDelfTest: sl<StartDelfTestUseCase>(),
       getActiveDelfTest: sl<GetActiveDelfTestUseCase>(),
+      getDelfHistory: sl<GetDelfHistoryUseCase>(),
       submitDelfSection: sl<SubmitDelfSectionUseCase>(),
       finishDelfTest: sl<FinishDelfTestUseCase>(),
       getDelfResults: sl<GetDelfResultsUseCase>(),

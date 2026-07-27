@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/router/app_router.dart';
-import '../../../../core/network/media_url.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
@@ -15,6 +14,7 @@ import '../../../parcours/presentation/widgets/completion_ring.dart';
 import '../../../parcours/presentation/widgets/parcours_path_preview.dart';
 import '../../../parcours/presentation/widgets/streak_chip.dart';
 import '../../../parcours/presentation/widgets/xp_chip.dart';
+import '../../../profile/presentation/widgets/circular_profile_avatar.dart';
 import '../../../student/data/datasources/student_remote_data_source.dart';
 import '../../../student/domain/entities/student_models.dart';
 import '../cubit/home_cubit.dart';
@@ -500,7 +500,6 @@ class _HubHeader extends StatelessWidget {
       builder: (context, snapshot) {
         final hub = snapshot.data;
         final String? firstName = hub?.firstName;
-        final String avatarUrl = resolveMediaUrl(hub?.profilePictureUrl);
         final int streak = hub?.currentStreak ?? fallbackStreak;
         final int xp = hub?.totalXp ?? fallbackXp;
         return Row(
@@ -509,17 +508,12 @@ class _HubHeader extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.14),
-                    backgroundImage:
-                        avatarUrl.isEmpty ? null : NetworkImage(avatarUrl),
-                    child: avatarUrl.isEmpty
-                        ? const Icon(
-                            Icons.person_rounded,
-                            color: AppColors.primary,
-                          )
-                        : null,
+                  CircularProfileAvatar(
+                    imageUrl: hub?.profilePictureUrl,
+                    initials: firstName == null || firstName.isEmpty
+                        ? null
+                        : firstName.substring(0, 1).toUpperCase(),
+                    size: 48,
                   ),
                   const SizedBox(width: 12),
                   Expanded(

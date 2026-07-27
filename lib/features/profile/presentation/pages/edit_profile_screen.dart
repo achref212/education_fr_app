@@ -8,7 +8,6 @@ import '../../../../core/presentation/widgets/app_button.dart';
 import '../../../../core/presentation/widgets/app_text_field.dart';
 import '../../../../core/presentation/widgets/auth_screen_shell.dart';
 import '../../../../core/presentation/widgets/phone_field.dart';
-import '../../../../core/network/media_url.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
@@ -16,6 +15,7 @@ import '../../../auth/domain/entities/user.dart';
 import '../../../theme/presentation/cubit/theme_cubit.dart';
 import '../cubit/edit_profile_cubit.dart';
 import '../cubit/edit_profile_state.dart';
+import '../widgets/circular_profile_avatar.dart';
 import '../widgets/profile_picture_actions.dart';
 
 @RoutePage()
@@ -265,7 +265,6 @@ class _EditProfilePictureCard extends StatelessWidget {
         isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
     final subColor =
         isDark ? AppColors.darkBodySecondary : AppColors.lightBodySecondary;
-    final resolved = resolveMediaUrl(user.profilePictureUrl);
 
     return Material(
       color: Colors.transparent,
@@ -286,20 +285,12 @@ class _EditProfilePictureCard extends StatelessWidget {
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  CircleAvatar(
-                    radius: 34,
+                  CircularProfileAvatar(
+                    imageUrl: user.profilePictureUrl,
+                    initials: user.initials,
+                    size: 68,
                     backgroundColor: AppColors.primary,
-                    backgroundImage:
-                        resolved.isNotEmpty ? NetworkImage(resolved) : null,
-                    child: resolved.isEmpty
-                        ? Text(
-                            user.initials,
-                            style: AppTextStyles.titleLarge.copyWith(
-                              color: AppColors.onPrimary,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          )
-                        : null,
+                    foregroundColor: AppColors.onPrimary,
                   ),
                   Positioned(
                     right: -2,

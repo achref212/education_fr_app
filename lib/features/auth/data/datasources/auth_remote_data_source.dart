@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_constants.dart';
 import '../models/forgot_password_response_model.dart';
+import '../models/profile_image_asset_model.dart';
 import '../models/register_response_model.dart';
 import '../models/resend_activation_response_model.dart';
 import '../models/reset_token_response_model.dart';
@@ -70,10 +73,15 @@ abstract class AuthRemoteDataSource {
     required String contentType,
   });
 
+  Future<List<ProfileImageAssetModel>> listProfileImages();
+
   Future<String> generateProfileAvatar({
     required String style,
     required Map<String, dynamic> customization,
     String? prompt,
+    List<int>? selfieBytes,
+    String? selfieFilename,
+    String? selfieContentType,
   });
 
   Future<void> changePassword({
@@ -254,19 +262,48 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<List<ProfileImageAssetModel>> listProfileImages() async {
+    final response = await _dio.get<List<dynamic>>(ApiConstants.profileImages);
+    return (response.data ?? [])
+        .map((e) => ProfileImageAssetModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
   Future<String> generateProfileAvatar({
     required String style,
     required Map<String, dynamic> customization,
     String? prompt,
+    List<int>? selfieBytes,
+    String? selfieFilename,
+    String? selfieContentType,
   }) async {
-    final response = await _dio.post<Map<String, dynamic>>(
-      ApiConstants.profileAvatarGenerate,
-      data: {
-        'style': style,
-        'customization': customization,
-        if (prompt != null && prompt.trim().isNotEmpty) 'prompt': prompt.trim(),
-      },
-    );
+    final hasSelfie = selfieBytes != null && selfieBytes.isNotEmpty;
+    final response = hasSelfie
+        ? await _dio.post<Map<String, dynamic>>(
+            ApiConstants.profileAvatarGenerateFromSelfie,
+            data: FormData.fromMap({
+              'style': style,
+              'customization': jsonEncode(customization),
+              if (prompt != null && prompt.trim().isNotEmpty)
+                'prompt': prompt.trim(),
+              'selfie': MultipartFile.fromBytes(
+                selfieBytes,
+                filename: selfieFilename ?? 'selfie.jpg',
+                contentType:
+                    DioMediaType.parse(selfieContentType ?? 'image/jpeg'),
+              ),
+            }),
+          )
+        : await _dio.post<Map<String, dynamic>>(
+            ApiConstants.profileAvatarGenerate,
+            data: {
+              'style': style,
+              'customization': customization,
+              if (prompt != null && prompt.trim().isNotEmpty)
+                'prompt': prompt.trim(),
+            },
+          );
     return response.data!['url'] as String;
   }
 

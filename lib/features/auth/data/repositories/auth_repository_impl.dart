@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/storage/secure_token_storage.dart';
 import '../../domain/entities/register_result.dart';
+import '../../domain/entities/profile_image_asset.dart';
 import '../../domain/entities/school.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -231,16 +232,34 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, List<ProfileImageAsset>>> listProfileImages() async {
+    try {
+      final assets = await _remoteDataSource.listProfileImages();
+      return Right(assets.map((asset) => asset.toDomain()).toList());
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
   Future<Either<Failure, String>> generateProfileAvatar({
     required String style,
     required Map<String, dynamic> customization,
     String? prompt,
+    List<int>? selfieBytes,
+    String? selfieFilename,
+    String? selfieContentType,
   }) async {
     try {
       final url = await _remoteDataSource.generateProfileAvatar(
         style: style,
         customization: customization,
         prompt: prompt,
+        selfieBytes: selfieBytes,
+        selfieFilename: selfieFilename,
+        selfieContentType: selfieContentType,
       );
       return Right(url);
     } on DioException catch (e) {

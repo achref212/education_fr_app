@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AvatarCustomization {
   const AvatarCustomization({
     required this.style,
+    required this.gender,
     required this.skinTone,
     required this.faceShape,
     required this.hairStyle,
@@ -22,6 +23,7 @@ class AvatarCustomization {
   factory AvatarCustomization.defaults(AvatarStyle style) {
     return AvatarCustomization(
       style: style,
+      gender: AvatarGender.neutral,
       skinTone: style == AvatarStyle.realistic ? 1 : 2,
       faceShape: style == AvatarStyle.cartoon ? 2 : 0,
       hairStyle: style == AvatarStyle.realistic ? 3 : 1,
@@ -40,6 +42,7 @@ class AvatarCustomization {
   }
 
   final AvatarStyle style;
+  final AvatarGender gender;
   final int skinTone;
   final int faceShape;
   final int hairStyle;
@@ -57,6 +60,7 @@ class AvatarCustomization {
 
   AvatarCustomization copyWith({
     AvatarStyle? style,
+    AvatarGender? gender,
     int? skinTone,
     int? faceShape,
     int? hairStyle,
@@ -74,6 +78,7 @@ class AvatarCustomization {
   }) {
     return AvatarCustomization(
       style: style ?? this.style,
+      gender: gender ?? this.gender,
       skinTone: skinTone ?? this.skinTone,
       faceShape: faceShape ?? this.faceShape,
       hairStyle: hairStyle ?? this.hairStyle,
@@ -93,6 +98,7 @@ class AvatarCustomization {
 
   Map<String, dynamic> toPromptMap() => {
         'style': style.apiValue,
+        'gender': gender.apiValue,
         'skinTone': skinTone,
         'faceShape': faceShape,
         'hairStyle': hairStyle,
@@ -112,6 +118,8 @@ class AvatarCustomization {
 
 enum AvatarStyle { friendlySchool, realistic, cartoon }
 
+enum AvatarGender { neutral, girl, boy }
+
 extension AvatarStyleLabel on AvatarStyle {
   String get label => switch (this) {
         AvatarStyle.friendlySchool => 'École',
@@ -123,6 +131,20 @@ extension AvatarStyleLabel on AvatarStyle {
         AvatarStyle.friendlySchool => 'friendly_school',
         AvatarStyle.realistic => 'realistic',
         AvatarStyle.cartoon => 'cartoon',
+      };
+}
+
+extension AvatarGenderLabel on AvatarGender {
+  String get label => switch (this) {
+        AvatarGender.neutral => 'Neutre',
+        AvatarGender.girl => 'Fille',
+        AvatarGender.boy => 'Garçon',
+      };
+
+  String get apiValue => switch (this) {
+        AvatarGender.neutral => 'neutral',
+        AvatarGender.girl => 'girl',
+        AvatarGender.boy => 'boy',
       };
 }
 

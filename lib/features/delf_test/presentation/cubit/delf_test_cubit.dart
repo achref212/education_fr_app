@@ -8,6 +8,7 @@ import '../../domain/entities/delf_test_session.dart';
 import '../../domain/repositories/delf_test_repository.dart';
 import '../../domain/usecases/finish_delf_test_use_case.dart';
 import '../../domain/usecases/get_active_delf_test_use_case.dart';
+import '../../domain/usecases/get_delf_history_use_case.dart';
 import '../../domain/usecases/get_delf_results_use_case.dart';
 import '../../domain/usecases/start_delf_test_use_case.dart';
 import '../../domain/usecases/submit_delf_section_use_case.dart';
@@ -17,12 +18,14 @@ class DelfTestCubit extends Cubit<DelfTestState> {
   DelfTestCubit({
     required StartDelfTestUseCase startDelfTest,
     required GetActiveDelfTestUseCase getActiveDelfTest,
+    required GetDelfHistoryUseCase getDelfHistory,
     required SubmitDelfSectionUseCase submitDelfSection,
     required FinishDelfTestUseCase finishDelfTest,
     required GetDelfResultsUseCase getDelfResults,
     required GetCurrentUserUseCase getCurrentUser,
   })  : _startDelfTest = startDelfTest,
         _getActiveDelfTest = getActiveDelfTest,
+        _getDelfHistory = getDelfHistory,
         _submitDelfSection = submitDelfSection,
         _finishDelfTest = finishDelfTest,
         _getDelfResults = getDelfResults,
@@ -31,6 +34,7 @@ class DelfTestCubit extends Cubit<DelfTestState> {
 
   final StartDelfTestUseCase _startDelfTest;
   final GetActiveDelfTestUseCase _getActiveDelfTest;
+  final GetDelfHistoryUseCase _getDelfHistory;
   final SubmitDelfSectionUseCase _submitDelfSection;
   final FinishDelfTestUseCase _finishDelfTest;
   final GetDelfResultsUseCase _getDelfResults;
@@ -50,12 +54,7 @@ class DelfTestCubit extends Cubit<DelfTestState> {
               _emitQuestions(session);
               return;
             }
-            emit(
-              DelfTestState.intro(
-                classLevel: user.classLevel ?? '6ème année',
-                targetDelfLevel: 'A2',
-              ),
-            );
+            _emitIntro(user);
           },
         );
       },
@@ -74,11 +73,11 @@ class DelfTestCubit extends Cubit<DelfTestState> {
   Future<void> loadActiveSession() async {
     emit(const DelfTestState.loading());
     final result = await _getActiveDelfTest(const NoParams());
-    result.fold(
-      (failure) => emit(DelfTestState.error(failure.message)),
-      (DelfTestSession? session) {
+    await result.fold(
+      (failure) async => emit(DelfTestState.error(failure.message)),
+      (DelfTestSession? session) async {
         if (session == null) {
-          loadIntro();
+          await _loadLatestCompletedResultOrIntro();
           return;
         }
         _emitQuestions(session);
@@ -143,6 +142,37 @@ class DelfTestCubit extends Cubit<DelfTestState> {
     result.fold(
       (failure) => emit(DelfTestState.error(failure.message)),
       (results) => emit(DelfTestState.results(results)),
+    );
+  }
+
+  Future<void> _loadLatestCompletedResultOrIntro() async {
+    final historyResult = await _getDelfHistory(const NoParams());
+    await historyResult.fold(
+      (failure) async => emit(DelfTestState.error(failure.message)),
+      (history) async {
+        if (history.isEmpty) {
+          await _emitIntroForCurrentUser();
+          return;
+        }
+        await loadResults(history.first.sessionId);
+      },
+    );
+  }
+
+  Future<void> _emitIntroForCurrentUser() async {
+    final userResult = await _getCurrentUser(const NoParams());
+    userResult.fold(
+      (failure) => emit(DelfTestState.error(failure.message)),
+      _emitIntro,
+    );
+  }
+
+  void _emitIntro(User user) {
+    emit(
+      DelfTestState.intro(
+        classLevel: user.classLevel ?? '6ème année',
+        targetDelfLevel: 'A2',
+      ),
     );
   }
 

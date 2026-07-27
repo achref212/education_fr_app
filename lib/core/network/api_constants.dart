@@ -32,7 +32,10 @@ class ApiConstants {
   static const String me = '/auth/me';
   static const String changePassword = '/auth/change-password';
   static const String profileUpload = '/assets/profile-upload';
+  static const String profileImages = '/assets/profile-images';
   static const String profileAvatarGenerate = '/assets/profile-avatar/generate';
+  static const String profileAvatarGenerateFromSelfie =
+      '/assets/profile-avatar/generate-from-selfie';
 
   // Progress
   static const String progress = '/progress';
