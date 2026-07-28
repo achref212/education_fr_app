@@ -162,6 +162,13 @@ class _FakeAuthRepository implements AuthRepository {
       throw UnimplementedError();
 
   @override
+  Future<Either<Failure, Unit>> confirmAccountDeletion({
+    required String deletionStateToken,
+    required String code,
+  }) =>
+      throw UnimplementedError();
+
+  @override
   Future<Either<Failure, String?>> forgotPassword({required String email}) =>
       throw UnimplementedError();
 
@@ -208,6 +215,12 @@ class _FakeAuthRepository implements AuthRepository {
       throw UnimplementedError();
 
   @override
+  Future<Either<Failure, String>> requestAccountDeletionCode({
+    required String deletionSessionToken,
+  }) =>
+      throw UnimplementedError();
+
+  @override
   Future<Either<Failure, String?>> resendActivation({required String email}) =>
       throw UnimplementedError();
 
@@ -250,6 +263,12 @@ class _FakeAuthRepository implements AuthRepository {
     required String email,
     required String code,
     required String resetStateToken,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, String>> verifyAccountDeletionPassword({
+    required String password,
   }) =>
       throw UnimplementedError();
 }

@@ -11,6 +11,50 @@
 part of 'app_router.dart';
 
 /// generated route for
+/// [AccountDeletionPasswordRecoveryScreen]
+class AccountDeletionPasswordRecoveryRoute
+    extends PageRouteInfo<AccountDeletionPasswordRecoveryRouteArgs> {
+  AccountDeletionPasswordRecoveryRoute({
+    Key? key,
+    required String email,
+    List<PageRouteInfo>? children,
+  }) : super(
+         AccountDeletionPasswordRecoveryRoute.name,
+         args: AccountDeletionPasswordRecoveryRouteArgs(key: key, email: email),
+         initialChildren: children,
+       );
+
+  static const String name = 'AccountDeletionPasswordRecoveryRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<AccountDeletionPasswordRecoveryRouteArgs>();
+      return AccountDeletionPasswordRecoveryScreen(
+        key: args.key,
+        email: args.email,
+      );
+    },
+  );
+}
+
+class AccountDeletionPasswordRecoveryRouteArgs {
+  const AccountDeletionPasswordRecoveryRouteArgs({
+    this.key,
+    required this.email,
+  });
+
+  final Key? key;
+
+  final String email;
+
+  @override
+  String toString() {
+    return 'AccountDeletionPasswordRecoveryRouteArgs{key: $key, email: $email}';
+  }
+}
+
+/// generated route for
 /// [AchievementsScreen]
 class AchievementsRoute extends PageRouteInfo<void> {
   const AchievementsRoute({List<PageRouteInfo>? children})
@@ -40,6 +84,43 @@ class ChangePasswordRoute extends PageRouteInfo<void> {
       return const ChangePasswordScreen();
     },
   );
+}
+
+/// generated route for
+/// [DeleteAccountScreen]
+class DeleteAccountRoute extends PageRouteInfo<DeleteAccountRouteArgs> {
+  DeleteAccountRoute({
+    Key? key,
+    required User user,
+    List<PageRouteInfo>? children,
+  }) : super(
+         DeleteAccountRoute.name,
+         args: DeleteAccountRouteArgs(key: key, user: user),
+         initialChildren: children,
+       );
+
+  static const String name = 'DeleteAccountRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      final args = data.argsAs<DeleteAccountRouteArgs>();
+      return DeleteAccountScreen(key: args.key, user: args.user);
+    },
+  );
+}
+
+class DeleteAccountRouteArgs {
+  const DeleteAccountRouteArgs({this.key, required this.user});
+
+  final Key? key;
+
+  final User user;
+
+  @override
+  String toString() {
+    return 'DeleteAccountRouteArgs{key: $key, user: $user}';
+  }
 }
 
 /// generated route for

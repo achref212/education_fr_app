@@ -288,6 +288,57 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, String>> verifyAccountDeletionPassword({
+    required String password,
+  }) async {
+    try {
+      final token = await _remoteDataSource.verifyAccountDeletionPassword(
+        password: password,
+      );
+      return Right(token);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> requestAccountDeletionCode({
+    required String deletionSessionToken,
+  }) async {
+    try {
+      final token = await _remoteDataSource.requestAccountDeletionCode(
+        deletionSessionToken: deletionSessionToken,
+      );
+      return Right(token);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> confirmAccountDeletion({
+    required String deletionStateToken,
+    required String code,
+  }) async {
+    try {
+      await _remoteDataSource.confirmAccountDeletion(
+        deletionStateToken: deletionStateToken,
+        code: code,
+      );
+      await _tokenStorage.clearAccessToken();
+      return const Right(unit);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur: $e'));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> logout() async {
     try {
       await _tokenStorage.clearAccessToken();

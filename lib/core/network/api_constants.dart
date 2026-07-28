@@ -31,6 +31,11 @@ class ApiConstants {
   static const String login = '/auth/login';
   static const String me = '/auth/me';
   static const String changePassword = '/auth/change-password';
+  static const String accountDeletionPasswordCheck =
+      '/auth/account-deletion/password-check';
+  static const String accountDeletionRequestCode =
+      '/auth/account-deletion/request-code';
+  static const String accountDeletionConfirm = '/auth/account-deletion/confirm';
   static const String profileUpload = '/assets/profile-upload';
   static const String profileImages = '/assets/profile-images';
   static const String profileAvatarGenerate = '/assets/profile-avatar/generate';

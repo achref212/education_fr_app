@@ -21,7 +21,10 @@ import '../features/auth/domain/usecases/set_profile_picture_use_case.dart';
 import '../features/auth/domain/usecases/verify_registration_use_case.dart';
 import '../features/auth/domain/usecases/verify_reset_code_use_case.dart';
 import '../features/auth/domain/usecases/change_password_use_case.dart';
+import '../features/auth/domain/usecases/confirm_account_deletion_use_case.dart';
 import '../features/auth/domain/usecases/update_profile_use_case.dart';
+import '../features/auth/domain/usecases/request_account_deletion_code_use_case.dart';
+import '../features/auth/domain/usecases/verify_account_deletion_password_use_case.dart';
 import '../features/auth/presentation/cubit/forgot_password_cubit.dart';
 import '../features/auth/presentation/cubit/login_cubit.dart';
 import '../features/auth/presentation/cubit/register_cubit.dart';
@@ -43,6 +46,7 @@ import '../features/theme/domain/usecases/get_theme_mode_use_case.dart';
 import '../features/theme/domain/usecases/set_theme_mode_use_case.dart';
 import '../features/theme/presentation/cubit/theme_cubit.dart';
 import '../features/profile/presentation/cubit/change_password_cubit.dart';
+import '../features/profile/presentation/cubit/delete_account_cubit.dart';
 import '../features/profile/presentation/cubit/edit_profile_cubit.dart';
 import '../features/profile/presentation/cubit/profile_cubit.dart';
 import '../features/splash/presentation/cubit/splash_cubit.dart';
@@ -197,6 +201,12 @@ void _registerAuthFeature() {
       () => GenerateProfileAvatarAssetUseCase(sl<AuthRepository>()));
   sl.registerFactory<ChangePasswordUseCase>(
       () => ChangePasswordUseCase(sl<AuthRepository>()));
+  sl.registerFactory<VerifyAccountDeletionPasswordUseCase>(
+      () => VerifyAccountDeletionPasswordUseCase(sl<AuthRepository>()));
+  sl.registerFactory<RequestAccountDeletionCodeUseCase>(
+      () => RequestAccountDeletionCodeUseCase(sl<AuthRepository>()));
+  sl.registerFactory<ConfirmAccountDeletionUseCase>(
+      () => ConfirmAccountDeletionUseCase(sl<AuthRepository>()));
 }
 
 void _registerProfileFeature() {
@@ -212,6 +222,13 @@ void _registerProfileFeature() {
   sl.registerFactory<ChangePasswordCubit>(
     () =>
         ChangePasswordCubit(changePasswordUseCase: sl<ChangePasswordUseCase>()),
+  );
+  sl.registerFactory<DeleteAccountCubit>(
+    () => DeleteAccountCubit(
+      verifyPasswordUseCase: sl<VerifyAccountDeletionPasswordUseCase>(),
+      requestCodeUseCase: sl<RequestAccountDeletionCodeUseCase>(),
+      confirmDeletionUseCase: sl<ConfirmAccountDeletionUseCase>(),
+    ),
   );
 }
 

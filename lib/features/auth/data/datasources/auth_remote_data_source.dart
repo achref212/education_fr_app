@@ -88,6 +88,19 @@ abstract class AuthRemoteDataSource {
     required String oldPassword,
     required String newPassword,
   });
+
+  Future<String> verifyAccountDeletionPassword({
+    required String password,
+  });
+
+  Future<String> requestAccountDeletionCode({
+    required String deletionSessionToken,
+  });
+
+  Future<void> confirmAccountDeletion({
+    required String deletionStateToken,
+    required String code,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -317,6 +330,42 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       data: {
         'oldPassword': oldPassword,
         'newPassword': newPassword,
+      },
+    );
+  }
+
+  @override
+  Future<String> verifyAccountDeletionPassword({
+    required String password,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiConstants.accountDeletionPasswordCheck,
+      data: {'password': password},
+    );
+    return response.data!['deletion_session_token'] as String;
+  }
+
+  @override
+  Future<String> requestAccountDeletionCode({
+    required String deletionSessionToken,
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      ApiConstants.accountDeletionRequestCode,
+      data: {'deletion_session_token': deletionSessionToken},
+    );
+    return response.data!['deletion_state_token'] as String;
+  }
+
+  @override
+  Future<void> confirmAccountDeletion({
+    required String deletionStateToken,
+    required String code,
+  }) async {
+    await _dio.post<void>(
+      ApiConstants.accountDeletionConfirm,
+      data: {
+        'deletion_state_token': deletionStateToken,
+        'code': code,
       },
     );
   }

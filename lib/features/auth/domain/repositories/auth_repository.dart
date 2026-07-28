@@ -80,5 +80,18 @@ abstract class AuthRepository {
     required String newPassword,
   });
 
+  Future<Either<Failure, String>> verifyAccountDeletionPassword({
+    required String password,
+  });
+
+  Future<Either<Failure, String>> requestAccountDeletionCode({
+    required String deletionSessionToken,
+  });
+
+  Future<Either<Failure, Unit>> confirmAccountDeletion({
+    required String deletionStateToken,
+    required String code,
+  });
+
   Future<Either<Failure, Unit>> logout();
 }

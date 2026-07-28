@@ -261,6 +261,15 @@ class _ProfileContent extends StatelessWidget {
                       isDestructive: true,
                       onTap: () => _logout(context),
                     ),
+                    ProfileActionTile(
+                      icon: Icons.delete_forever_rounded,
+                      title: 'Supprimer le compte',
+                      subtitle: 'Effacer définitivement votre compte',
+                      isDestructive: true,
+                      onTap: () => context.router.push(
+                        DeleteAccountRoute(user: user),
+                      ),
+                    ),
                   ],
                 )
                     .animate(delay: 250.ms)

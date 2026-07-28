@@ -12,7 +12,9 @@ import 'package:education_fr_app/features/delf_test/domain/usecases/get_delf_res
 import 'package:education_fr_app/features/student/data/datasources/student_remote_data_source.dart';
 import 'package:education_fr_app/features/student/domain/entities/delf_mock_exam_models.dart';
 import 'package:education_fr_app/features/student/domain/entities/student_models.dart';
+import 'package:education_fr_app/features/student/presentation/pages/delf_mock_exam_attempt_screen.dart';
 import 'package:education_fr_app/features/student/presentation/pages/delf_mock_exam_list_screen.dart';
+import 'package:education_fr_app/features/student/presentation/pages/delf_mock_exam_result_screen.dart';
 import 'package:education_fr_app/features/student/presentation/pages/personalized_parcours_reveal_screen.dart';
 import 'package:education_fr_app/injection/injection_container.dart';
 
@@ -41,6 +43,53 @@ void main() {
           'Ton école n’a pas encore publié d’examen blanc pour le moment.'),
       findsOneWidget,
     );
+  });
+
+  testWidgets('mock exam attempt has no visible return control',
+      (tester) async {
+    sl.registerLazySingleton<StudentRemoteDataSource>(
+      () => _FakeStudentDataSource(
+        exams: const [],
+        attempt: _mockAttempt(status: 'in_progress'),
+      ),
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(
+          home: DelfMockExamAttemptScreen(attemptId: 'attempt-1')),
+    );
+    await tester.pump();
+
+    expect(find.byTooltip('Back'), findsNothing);
+    expect(find.byIcon(Icons.arrow_back), findsNothing);
+    expect(find.text('Quitter le test'), findsNothing);
+    expect(find.text('Examen blanc'), findsOneWidget);
+  });
+
+  testWidgets('mock exam result shows parcours status and primary CTA',
+      (tester) async {
+    sl.registerLazySingleton<StudentRemoteDataSource>(
+      () => _FakeStudentDataSource(
+        exams: const [],
+        attempt: _mockAttempt(status: 'completed', score: 72),
+      ),
+    );
+
+    await tester.pumpWidget(
+      const MaterialApp(home: DelfMockExamResultScreen(attemptId: 'attempt-1')),
+    );
+    await tester.pump();
+
+    expect(find.text('Ton score estimé est d’environ 72/100'), findsOneWidget);
+    expect(find.text('Priorités du parcours'), findsOneWidget);
+    expect(find.text('Renforcement: Vocabulaire'), findsOneWidget);
+    expect(find.text('Parcours DELF personnalisé'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Ouvrir mon parcours DELF'),
+      120,
+    );
+    expect(find.text('Ouvrir mon parcours DELF'), findsOneWidget);
+    expect(find.text('Retour à l’accueil'), findsNothing);
   });
 
   testWidgets('personalized parcours reveal moves from loading to summary',
@@ -72,9 +121,10 @@ void main() {
 }
 
 class _FakeStudentDataSource implements StudentRemoteDataSource {
-  _FakeStudentDataSource({required this.exams});
+  _FakeStudentDataSource({required this.exams, this.attempt});
 
   final List<StudentDelfMockExam> exams;
+  final StudentDelfMockAttempt? attempt;
 
   @override
   Future<List<StudentDelfMockExam>> getDelfMockExams() async => exams;
@@ -119,7 +169,7 @@ class _FakeStudentDataSource implements StudentRemoteDataSource {
 
   @override
   Future<StudentDelfMockAttempt> getDelfMockAttempt(String attemptId) =>
-      throw UnimplementedError();
+      Future.value(attempt ?? _mockAttempt(status: 'in_progress'));
 
   @override
   Future<StudentLeaderboard> getLeaderboard(String scope) =>
@@ -138,6 +188,78 @@ class _FakeStudentDataSource implements StudentRemoteDataSource {
     required List<StudentDelfMockAnswer> answers,
   }) =>
       throw UnimplementedError();
+}
+
+StudentDelfMockAttempt _mockAttempt({required String status, int? score}) {
+  const exam = StudentDelfMockExam(
+    id: 'exam-1',
+    track: 'Junior',
+    level: 'A1',
+    title: 'Examen blanc A1',
+    status: 'published',
+    totalDurationMinutes: 60,
+    totalPoints: 100,
+    sections: [
+      StudentDelfMockSection(
+        id: 'section-1',
+        examId: 'exam-1',
+        sectionOrder: 1,
+        sectionType: 'reading',
+        title: 'Compréhension des écrits',
+        durationMinutes: 15,
+        points: 25,
+        instructions: 'Lis puis réponds.',
+        rubric: {},
+        metadata: {},
+        items: [
+          StudentDelfMockItem(
+            id: 'item-1',
+            sectionId: 'section-1',
+            itemOrder: 1,
+            title: 'Question 1',
+            prompt: 'Choisis la bonne réponse.',
+            points: 25,
+            content: {
+              'options': ['A', 'B'],
+            },
+            answerKey: {},
+            rubric: {},
+            metadata: {},
+          ),
+        ],
+      ),
+    ],
+    assets: [],
+  );
+  return StudentDelfMockAttempt(
+    attemptId: 'attempt-1',
+    examId: 'exam-1',
+    status: status,
+    answers: const [],
+    sectionScores: score == null ? const {} : const {'reading': 8},
+    approximate: true,
+    startedAt: '2026-01-01T00:00:00Z',
+    exam: exam,
+    overallScore: score,
+    resultMessage:
+        score == null ? null : 'Ton score estimé est d’environ $score/100',
+    finishedAt: score == null ? null : '2026-01-01T00:10:00Z',
+    assignedLearningPathId: score == null ? null : 'path-1',
+    parcoursGeneratedByAi: score == null ? null : true,
+    parcoursAssignmentStatus: score == null ? null : 'ai_generated',
+    weakSkills: score == null
+        ? const []
+        : const [
+            StudentDelfMockWeakSkill(
+              sectionType: 'reading',
+              title: 'Compréhension des écrits',
+              score: 8,
+              points: 25,
+              percent: 32,
+              practiceCategory: 'Vocabulaire',
+            ),
+          ],
+  );
 }
 
 class _FakeDelfRepository implements DelfTestRepository {

@@ -120,6 +120,7 @@ class StudentRemoteDataSourceImpl implements StudentRemoteDataSource {
             .map((StudentDelfMockAnswer answer) => answer.toJson())
             .toList(),
       },
+      options: Options(receiveTimeout: const Duration(seconds: 70)),
     );
     return StudentDelfMockAttempt.fromJson(response.data!);
   }

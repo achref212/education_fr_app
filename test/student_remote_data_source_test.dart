@@ -57,6 +57,10 @@ void main() {
     expect(attempt.status, 'in_progress');
     expect(loadedAttempt.exam.title, 'Examen blanc A1');
     expect(submitted.resultMessage, 'Ton score estimé est d’environ 75/100');
+    expect(submitted.assignedLearningPathId, 'path-1');
+    expect(submitted.parcoursGeneratedByAi, isTrue);
+    expect(submitted.parcoursAssignmentStatus, 'ai_generated');
+    expect(submitted.weakSkills.single.practiceCategory, 'Vocabulaire');
     expect(
       requests.map((request) => request.path),
       <String>[
@@ -74,6 +78,7 @@ void main() {
       ],
     );
     expect(requests[1].queryParameters['scope'], 'class');
+    expect(requests.last.receiveTimeout, const Duration(seconds: 70));
   });
 }
 
@@ -270,6 +275,21 @@ Map<String, dynamic> _attempt({required String status, int? score}) => {
       'approximate': true,
       'resultMessage':
           score == null ? null : 'Ton score estimé est d’environ $score/100',
+      'assignedLearningPathId': score == null ? null : 'path-1',
+      'parcoursGeneratedByAi': score == null ? null : true,
+      'parcoursAssignmentStatus': score == null ? null : 'ai_generated',
+      'weakSkills': score == null
+          ? []
+          : [
+              {
+                'sectionType': 'reading',
+                'title': 'Compréhension des écrits',
+                'score': 8,
+                'points': 25,
+                'percent': 32,
+                'practiceCategory': 'Vocabulaire',
+              },
+            ],
       'startedAt': '2026-01-01T00:00:00Z',
       'finishedAt': score == null ? null : '2026-01-01T00:10:00Z',
       'exam': _exam(),

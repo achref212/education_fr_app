@@ -79,6 +79,7 @@ class DelfTestRemoteDataSourceImpl implements DelfTestRemoteDataSource {
   Future<DelfTestResultsModel> finishTest(String sessionId) async {
     final response = await _dio.post<Map<String, dynamic>>(
       ApiConstants.delfTestFinish(sessionId),
+      options: Options(receiveTimeout: const Duration(seconds: 70)),
     );
     return DelfTestResultsModel.fromJson(response.data!);
   }

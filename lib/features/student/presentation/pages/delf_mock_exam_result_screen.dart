@@ -54,20 +54,36 @@ class DelfMockExamResultScreen extends StatelessWidget {
                 const SizedBox(height: 10),
               ],
               const SizedBox(height: 18),
+              if (attempt.weakSkills.isNotEmpty) ...[
+                Text(
+                  'Priorités du parcours',
+                  style: AppTextStyles.titleMedium.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                for (final skill in attempt.weakSkills.take(3)) ...[
+                  _WeakSkillTile(skill: skill),
+                  const SizedBox(height: 10),
+                ],
+                const SizedBox(height: 8),
+              ],
+              _ParcoursStatusCard(attempt: attempt),
+              const SizedBox(height: 18),
               FilledButton.icon(
+                onPressed: () => context.router.replaceAll([
+                  const MainRoute(children: [ParcoursRoute()]),
+                ]),
+                icon: const Icon(Icons.route_rounded),
+                label: const Text('Ouvrir mon parcours DELF'),
+              ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
                 onPressed: () => context.router.replaceAll([
                   const MainRoute(children: [ReviewCenterRoute()]),
                 ]),
                 icon: const Icon(Icons.psychology_alt_rounded),
                 label: const Text('Réviser mes erreurs'),
-              ),
-              const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: () => context.router.replaceAll([
-                  const MainRoute(children: [HomeRoute()]),
-                ]),
-                icon: const Icon(Icons.home_rounded),
-                label: const Text('Retour à l’accueil'),
               ),
             ],
           );
@@ -110,6 +126,105 @@ class _ScoreHero extends StatelessWidget {
             'Score automatique approximatif pour t’aider à te situer avant la correction d’un professeur.',
             textAlign: TextAlign.center,
             style: AppTextStyles.bodySmall.copyWith(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeakSkillTile extends StatelessWidget {
+  const _WeakSkillTile({required this.skill});
+
+  final StudentDelfMockWeakSkill skill;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.auto_awesome_rounded, color: AppColors.accent),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  skill.title,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Renforcement: ${skill.practiceCategory}',
+                  style: AppTextStyles.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${skill.percent}%',
+            style: AppTextStyles.calloutBold.copyWith(color: AppColors.primary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ParcoursStatusCard extends StatelessWidget {
+  const _ParcoursStatusCard({required this.attempt});
+
+  final StudentDelfMockAttempt attempt;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final message = switch (attempt.parcoursAssignmentStatus) {
+      'ai_generated' =>
+        'Ton nouveau parcours personnalisé a été généré avec l’IA à partir de ton score et de ton niveau.',
+      'matched' =>
+        'Un parcours adapté à ton score et à ton niveau DELF est prêt.',
+      'default' => 'Un parcours de référence adapté à ta classe est prêt.',
+      _ =>
+        'Ton parcours reste disponible; l’IA pourra le personnaliser dès que le service sera prêt.',
+    };
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.accentMint.withValues(alpha: isDark ? 0.18 : 0.12),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.accentMint.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.route_rounded, color: AppColors.accentMint),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Parcours DELF personnalisé',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(message, style: AppTextStyles.bodySmall),
+              ],
+            ),
           ),
         ],
       ),

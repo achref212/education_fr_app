@@ -47,43 +47,46 @@ class _DelfQuestionScreenState extends State<DelfQuestionScreen> {
           );
         },
         builder: (context, state) {
-          return Scaffold(
-            backgroundColor: background,
-            body: SafeArea(
-              child: state.when(
-                initial: () => const _TestLoadingView(
-                  message: 'Préparation de ton test…',
+          return PopScope(
+            canPop: false,
+            child: Scaffold(
+              backgroundColor: background,
+              body: SafeArea(
+                child: state.when(
+                  initial: () => const _TestLoadingView(
+                    message: 'Préparation de ton test…',
+                  ),
+                  loading: () => const _TestLoadingView(
+                    message: 'Chargement des questions…',
+                  ),
+                  submitting: () => const _TestLoadingView(
+                    message: 'Validation de tes réponses…',
+                  ),
+                  intro: (_, __) => const _TestLoadingView(
+                    message: 'Préparation de ton test…',
+                  ),
+                  results: (_) => const _TestLoadingView(
+                    message: 'Calcul de ton résultat…',
+                  ),
+                  error: (message) => _TestErrorView(
+                    message: message,
+                    onRetry: () =>
+                        context.read<DelfTestCubit>().loadActiveSession(),
+                  ),
+                  questions: (session, section, sectionIndex, totalSections) {
+                    if (_currentQuestionIndex >= section.questions.length) {
+                      _currentQuestionIndex = 0;
+                    }
+                    return _buildQuestionView(
+                      context,
+                      session,
+                      section,
+                      sectionIndex,
+                      totalSections,
+                      isDark,
+                    );
+                  },
                 ),
-                loading: () => const _TestLoadingView(
-                  message: 'Chargement des questions…',
-                ),
-                submitting: () => const _TestLoadingView(
-                  message: 'Validation de tes réponses…',
-                ),
-                intro: (_, __) => const _TestLoadingView(
-                  message: 'Préparation de ton test…',
-                ),
-                results: (_) => const _TestLoadingView(
-                  message: 'Calcul de ton résultat…',
-                ),
-                error: (message) => _TestErrorView(
-                  message: message,
-                  onRetry: () =>
-                      context.read<DelfTestCubit>().loadActiveSession(),
-                ),
-                questions: (session, section, sectionIndex, totalSections) {
-                  if (_currentQuestionIndex >= section.questions.length) {
-                    _currentQuestionIndex = 0;
-                  }
-                  return _buildQuestionView(
-                    context,
-                    session,
-                    section,
-                    sectionIndex,
-                    totalSections,
-                    isDark,
-                  );
-                },
               ),
             ),
           );
@@ -122,12 +125,6 @@ class _DelfQuestionScreenState extends State<DelfQuestionScreen> {
         children: [
           Row(
             children: [
-              _RoundIconButton(
-                icon: Icons.close_rounded,
-                tooltip: 'Quitter le test',
-                onPressed: () => context.router.maybePop(),
-              ),
-              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -557,41 +554,6 @@ class _ProgressHeader extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _RoundIconButton extends StatelessWidget {
-  const _RoundIconButton({
-    required this.icon,
-    required this.tooltip,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final String tooltip;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return IconButton(
-      tooltip: tooltip,
-      onPressed: onPressed,
-      style: IconButton.styleFrom(
-        backgroundColor:
-            isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        foregroundColor:
-            isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary,
-        minimumSize: const Size(44, 44),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(
-            color: isDark ? AppColors.darkDivider : AppColors.lightDivider,
-          ),
-        ),
-      ),
-      icon: Icon(icon),
     );
   }
 }

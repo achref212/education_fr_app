@@ -50,80 +50,89 @@ class _DelfMockExamAttemptScreenState extends State<DelfMockExamAttemptScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
-      backgroundColor:
-          isDark ? AppColors.darkBackground : AppColors.lightBackground,
-      appBar: AppBar(title: const Text('Examen blanc')),
-      body: FutureBuilder<StudentDelfMockAttempt>(
-        future: _future,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError || snapshot.data == null) {
-            return const Center(child: Text('Tentative introuvable.'));
-          }
-          final attempt = snapshot.data!;
-          final entries = _entries(attempt.exam);
-          if (entries.isEmpty) {
-            return const Center(child: Text('Aucun exercice disponible.'));
-          }
-          final current = entries[_index];
-          final item = current.item;
-          final section = current.section;
-          final progress = (_index + 1) / entries.length;
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _ProgressHeader(
-                    section: section,
-                    current: _index + 1,
-                    total: entries.length,
-                    progress: progress,
-                  ),
-                  const SizedBox(height: 14),
-                  if (resolveMediaUrl(section.audioUrl).isNotEmpty)
-                    _AudioNotice(url: resolveMediaUrl(section.audioUrl)),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: _QuestionCard(
-                        section: section,
-                        item: item,
-                        selectedIndex: _selected[item.id],
-                        controller: _controllerFor(item.id),
-                        onSelected: (index) =>
-                            setState(() => _selected[item.id] = index),
-                        onTextChanged: () => setState(() {}),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor:
+            isDark ? AppColors.darkBackground : AppColors.lightBackground,
+        appBar: AppBar(
+          title: const Text('Examen blanc'),
+          automaticallyImplyLeading: false,
+        ),
+        body: FutureBuilder<StudentDelfMockAttempt>(
+          future: _future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError || snapshot.data == null) {
+              return const Center(child: Text('Tentative introuvable.'));
+            }
+            final attempt = snapshot.data!;
+            final entries = _entries(attempt.exam);
+            if (entries.isEmpty) {
+              return const Center(child: Text('Aucun exercice disponible.'));
+            }
+            if (_submitting) {
+              return const _MockSubmitLoading();
+            }
+            final current = entries[_index];
+            final item = current.item;
+            final section = current.section;
+            final progress = (_index + 1) / entries.length;
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _ProgressHeader(
+                      section: section,
+                      current: _index + 1,
+                      total: entries.length,
+                      progress: progress,
+                    ),
+                    const SizedBox(height: 14),
+                    if (resolveMediaUrl(section.audioUrl).isNotEmpty)
+                      _AudioNotice(url: resolveMediaUrl(section.audioUrl)),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: _QuestionCard(
+                          section: section,
+                          item: item,
+                          selectedIndex: _selected[item.id],
+                          controller: _controllerFor(item.id),
+                          onSelected: (index) =>
+                              setState(() => _selected[item.id] = index),
+                          onTextChanged: () => setState(() {}),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: _canContinue(item)
-                        ? () => _handleNext(attempt, entries)
-                        : null,
-                    icon: Icon(
-                      _index < entries.length - 1
-                          ? Icons.arrow_forward_rounded
-                          : Icons.check_rounded,
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: _canContinue(item)
+                          ? () => _handleNext(attempt, entries)
+                          : null,
+                      icon: Icon(
+                        _index < entries.length - 1
+                            ? Icons.arrow_forward_rounded
+                            : Icons.check_rounded,
+                      ),
+                      label: Text(
+                        _submitting
+                            ? 'Calcul du score...'
+                            : _index < entries.length - 1
+                                ? 'Continuer'
+                                : 'Terminer et voir mon score',
+                      ),
                     ),
-                    label: Text(
-                      _submitting
-                          ? 'Calcul du score...'
-                          : _index < entries.length - 1
-                              ? 'Continuer'
-                              : 'Terminer et voir mon score',
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -155,14 +164,24 @@ class _DelfMockExamAttemptScreenState extends State<DelfMockExamAttemptScreen> {
         text: item.isObjective ? null : _controllerFor(item.id).text.trim(),
       );
     }).toList();
-    final submitted = await _dataSource.submitDelfMockAttempt(
-      attemptId: attempt.attemptId,
-      answers: answers,
-    );
-    if (!mounted) return;
-    await context.router.replace(
-      DelfMockExamResultRoute(attemptId: submitted.attemptId),
-    );
+    try {
+      final submitted = await _dataSource.submitDelfMockAttempt(
+        attemptId: attempt.attemptId,
+        answers: answers,
+      );
+      if (!mounted) return;
+      await context.router.replace(
+        DelfMockExamResultRoute(attemptId: submitted.attemptId),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Impossible de terminer le test. Réessaie.'),
+        ),
+      );
+    }
   }
 
   List<_AttemptEntry> _entries(StudentDelfMockExam exam) {
@@ -178,6 +197,64 @@ class _AttemptEntry {
 
   final StudentDelfMockSection section;
   final StudentDelfMockItem item;
+}
+
+class _MockSubmitLoading extends StatelessWidget {
+  const _MockSubmitLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const SafeArea(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Center(child: CircularProgressIndicator()),
+            SizedBox(height: 26),
+            Text(
+              'Création de ton résultat DELF',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'On calcule ton score, on repère tes priorités et on prépare ton parcours personnalisé.',
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: 22),
+            _LoadingLine(text: 'Calcul du score estimé'),
+            SizedBox(height: 10),
+            _LoadingLine(text: 'Analyse des épreuves à renforcer'),
+            SizedBox(height: 10),
+            _LoadingLine(text: 'Génération du parcours DELF'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingLine extends StatelessWidget {
+  const _LoadingLine({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const SizedBox(
+          width: 18,
+          height: 18,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Text(text)),
+      ],
+    );
+  }
 }
 
 class _ProgressHeader extends StatelessWidget {

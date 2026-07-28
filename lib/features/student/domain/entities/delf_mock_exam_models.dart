@@ -183,6 +183,10 @@ class StudentDelfMockAttempt {
     this.overallScore,
     this.resultMessage,
     this.finishedAt,
+    this.assignedLearningPathId,
+    this.parcoursGeneratedByAi,
+    this.parcoursAssignmentStatus,
+    this.weakSkills = const <StudentDelfMockWeakSkill>[],
   });
 
   final String attemptId;
@@ -196,6 +200,10 @@ class StudentDelfMockAttempt {
   final String startedAt;
   final String? finishedAt;
   final StudentDelfMockExam exam;
+  final String? assignedLearningPathId;
+  final bool? parcoursGeneratedByAi;
+  final String? parcoursAssignmentStatus;
+  final List<StudentDelfMockWeakSkill> weakSkills;
 
   factory StudentDelfMockAttempt.fromJson(Map<String, dynamic> json) =>
       StudentDelfMockAttempt(
@@ -211,9 +219,43 @@ class StudentDelfMockAttempt {
         resultMessage: json['resultMessage']?.toString(),
         startedAt: json['startedAt']?.toString() ?? '',
         finishedAt: json['finishedAt']?.toString(),
+        assignedLearningPathId: json['assignedLearningPathId']?.toString(),
+        parcoursGeneratedByAi: json['parcoursGeneratedByAi'] as bool?,
+        parcoursAssignmentStatus: json['parcoursAssignmentStatus']?.toString(),
+        weakSkills: _jsonList(json['weakSkills'])
+            .map(StudentDelfMockWeakSkill.fromJson)
+            .toList(),
         exam: StudentDelfMockExam.fromJson(
           (json['exam'] as Map<String, dynamic>?) ?? <String, dynamic>{},
         ),
+      );
+}
+
+class StudentDelfMockWeakSkill {
+  const StudentDelfMockWeakSkill({
+    required this.sectionType,
+    required this.title,
+    required this.score,
+    required this.points,
+    required this.percent,
+    required this.practiceCategory,
+  });
+
+  final String sectionType;
+  final String title;
+  final int score;
+  final int points;
+  final int percent;
+  final String practiceCategory;
+
+  factory StudentDelfMockWeakSkill.fromJson(Map<String, dynamic> json) =>
+      StudentDelfMockWeakSkill(
+        sectionType: json['sectionType']?.toString() ?? '',
+        title: json['title']?.toString() ?? '',
+        score: _int(json['score']),
+        points: _int(json['points'], fallback: 25),
+        percent: _int(json['percent']),
+        practiceCategory: json['practiceCategory']?.toString() ?? '',
       );
 }
 

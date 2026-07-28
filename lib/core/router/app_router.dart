@@ -20,6 +20,8 @@ import '../../features/onboarding/presentation/pages/welcome_screen.dart';
 import '../../features/parcours/presentation/pages/parcours_screen.dart';
 import '../../features/parcours/presentation/pages/step_player_screen.dart';
 import '../../features/profile/presentation/pages/change_password_screen.dart';
+import '../../features/profile/presentation/pages/account_deletion_password_recovery_screen.dart';
+import '../../features/profile/presentation/pages/delete_account_screen.dart';
 import '../../features/profile/presentation/pages/edit_profile_screen.dart';
 import '../../features/profile/presentation/pages/profile_screen.dart';
 import '../../features/splash/presentation/pages/splash_screen.dart';
@@ -49,6 +51,8 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: ResetPasswordRoute.page),
         AutoRoute(page: EditProfileRoute.page),
         AutoRoute(page: ChangePasswordRoute.page),
+        AutoRoute(page: DeleteAccountRoute.page),
+        AutoRoute(page: AccountDeletionPasswordRecoveryRoute.page),
         AutoRoute(page: DelfIntroRoute.page),
         AutoRoute(page: DelfQuestionRoute.page),
         AutoRoute(page: DelfResultRoute.page, path: '/delf-result/:sessionId'),
