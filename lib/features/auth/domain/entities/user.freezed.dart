@@ -26,6 +26,7 @@ mixin _$User {
   bool get isActive => throw _privateConstructorUsedError;
   String? get phone => throw _privateConstructorUsedError;
   DateTime? get dateOfBirth => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
   String? get classLevel => throw _privateConstructorUsedError;
   String? get schoolId => throw _privateConstructorUsedError;
   String? get profilePictureUrl => throw _privateConstructorUsedError;
@@ -52,6 +53,7 @@ abstract class $UserCopyWith<$Res> {
       bool isActive,
       String? phone,
       DateTime? dateOfBirth,
+      String? gender,
       String? classLevel,
       String? schoolId,
       String? profilePictureUrl});
@@ -82,6 +84,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? isActive = null,
     Object? phone = freezed,
     Object? dateOfBirth = freezed,
+    Object? gender = freezed,
     Object? classLevel = freezed,
     Object? schoolId = freezed,
     Object? profilePictureUrl = freezed,
@@ -127,6 +130,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.dateOfBirth
           : dateOfBirth // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      gender: freezed == gender
+          ? _value.gender
+          : gender // ignore: cast_nullable_to_non_nullable
+              as String?,
       classLevel: freezed == classLevel
           ? _value.classLevel
           : classLevel // ignore: cast_nullable_to_non_nullable
@@ -161,6 +168,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       bool isActive,
       String? phone,
       DateTime? dateOfBirth,
+      String? gender,
       String? classLevel,
       String? schoolId,
       String? profilePictureUrl});
@@ -188,6 +196,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? isActive = null,
     Object? phone = freezed,
     Object? dateOfBirth = freezed,
+    Object? gender = freezed,
     Object? classLevel = freezed,
     Object? schoolId = freezed,
     Object? profilePictureUrl = freezed,
@@ -233,6 +242,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.dateOfBirth
           : dateOfBirth // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      gender: freezed == gender
+          ? _value.gender
+          : gender // ignore: cast_nullable_to_non_nullable
+              as String?,
       classLevel: freezed == classLevel
           ? _value.classLevel
           : classLevel // ignore: cast_nullable_to_non_nullable
@@ -263,6 +276,7 @@ class _$UserImpl extends _User {
       this.isActive = true,
       this.phone,
       this.dateOfBirth,
+      this.gender,
       this.classLevel,
       this.schoolId,
       this.profilePictureUrl})
@@ -291,6 +305,8 @@ class _$UserImpl extends _User {
   @override
   final DateTime? dateOfBirth;
   @override
+  final String? gender;
+  @override
   final String? classLevel;
   @override
   final String? schoolId;
@@ -299,7 +315,7 @@ class _$UserImpl extends _User {
 
   @override
   String toString() {
-    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, level: $level, createdAt: $createdAt, role: $role, isActive: $isActive, phone: $phone, dateOfBirth: $dateOfBirth, classLevel: $classLevel, schoolId: $schoolId, profilePictureUrl: $profilePictureUrl)';
+    return 'User(id: $id, email: $email, firstName: $firstName, lastName: $lastName, level: $level, createdAt: $createdAt, role: $role, isActive: $isActive, phone: $phone, dateOfBirth: $dateOfBirth, gender: $gender, classLevel: $classLevel, schoolId: $schoolId, profilePictureUrl: $profilePictureUrl)';
   }
 
   @override
@@ -322,6 +338,7 @@ class _$UserImpl extends _User {
             (identical(other.phone, phone) || other.phone == phone) &&
             (identical(other.dateOfBirth, dateOfBirth) ||
                 other.dateOfBirth == dateOfBirth) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.classLevel, classLevel) ||
                 other.classLevel == classLevel) &&
             (identical(other.schoolId, schoolId) ||
@@ -343,6 +360,7 @@ class _$UserImpl extends _User {
       isActive,
       phone,
       dateOfBirth,
+      gender,
       classLevel,
       schoolId,
       profilePictureUrl);
@@ -368,6 +386,7 @@ abstract class _User extends User {
       final bool isActive,
       final String? phone,
       final DateTime? dateOfBirth,
+      final String? gender,
       final String? classLevel,
       final String? schoolId,
       final String? profilePictureUrl}) = _$UserImpl;
@@ -393,6 +412,8 @@ abstract class _User extends User {
   String? get phone;
   @override
   DateTime? get dateOfBirth;
+  @override
+  String? get gender;
   @override
   String? get classLevel;
   @override

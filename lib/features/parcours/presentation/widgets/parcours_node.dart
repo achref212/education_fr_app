@@ -28,18 +28,20 @@ class ParcoursNode extends StatelessWidget {
         isDark ? AppColors.darkBodySecondary : AppColors.lightBodySecondary;
     final Color nodeColor = _resolveNodeColor();
     final IconData icon = _resolveIcon();
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: [
-            GestureDetector(
-              onTap: step.canStart ? onTap : null,
-              child: Container(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: step.canOpen ? onTap : null,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            children: [
+              Container(
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: nodeColor.withValues(alpha: step.isLocked ? 0.15 : 0.2),
+                  color:
+                      nodeColor.withValues(alpha: step.isLocked ? 0.15 : 0.2),
                   shape: BoxShape.circle,
                   border: Border.all(color: nodeColor, width: 2),
                 ),
@@ -48,45 +50,59 @@ class ParcoursNode extends StatelessWidget {
                   color: nodeColor,
                   size: 22,
                 ),
-              ),
-            )
-                .animate(delay: animationDelay)
-                .fadeIn(duration: 350.ms)
-                .slideX(begin: -0.1, end: 0),
-            if (!isLast)
-              Container(
-                width: 2,
-                height: 48,
-                color: step.isCompleted
-                    ? AppColors.success.withValues(alpha: 0.5)
-                    : (isDark ? AppColors.darkDivider : AppColors.lightDivider),
-              ),
-          ],
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 4, bottom: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  step.title,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: step.isLocked ? secondaryColor : textColor,
+              )
+                  .animate(delay: animationDelay)
+                  .fadeIn(duration: 350.ms)
+                  .slideX(begin: -0.1, end: 0),
+              if (!isLast)
+                Container(
+                  width: 2,
+                  height: 48,
+                  color: step.isCompleted
+                      ? AppColors.success.withValues(alpha: 0.5)
+                      : (isDark
+                          ? AppColors.darkDivider
+                          : AppColors.lightDivider),
+                ),
+            ],
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4, bottom: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    step.title,
+                    style: AppTextStyles.bodyLarge.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: step.isLocked ? secondaryColor : textColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  _resolveSubtitle(),
-                  style: AppTextStyles.bodySmall.copyWith(color: secondaryColor),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    _resolveSubtitle(),
+                    style:
+                        AppTextStyles.bodySmall.copyWith(color: secondaryColor),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+          if (step.canOpen)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Icon(
+                step.isCompleted
+                    ? Icons.visibility_rounded
+                    : Icons.arrow_forward_ios_rounded,
+                color: secondaryColor,
+                size: 18,
+              ),
+            ),
+        ],
+      ),
     );
   }
 

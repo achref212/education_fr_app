@@ -5,12 +5,44 @@ import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
+import '../../../auth/presentation/auth_constants.dart';
 import '../../data/datasources/student_remote_data_source.dart';
 import '../../domain/entities/delf_mock_exam_models.dart';
 
 @RoutePage()
-class DelfMockExamListScreen extends StatelessWidget {
+class DelfMockExamListScreen extends StatefulWidget {
   const DelfMockExamListScreen({super.key});
+
+  @override
+  State<DelfMockExamListScreen> createState() => _DelfMockExamListScreenState();
+}
+
+class _DelfMockExamListScreenState extends State<DelfMockExamListScreen> {
+  String? _classLevel;
+  String? _level;
+  late Future<List<StudentDelfMockExam>> _future;
+
+  static const List<String> _delfLevels = ['A1.1', 'A1', 'A2', 'B1', 'B2'];
+
+  @override
+  void initState() {
+    super.initState();
+    _future = _load();
+  }
+
+  Future<List<StudentDelfMockExam>> _load() =>
+      sl<StudentRemoteDataSource>().getDelfMockExams(
+        classLevel: _classLevel,
+        level: _level,
+      );
+
+  void _setFilters({String? classLevel, String? level}) {
+    setState(() {
+      _classLevel = classLevel;
+      _level = level;
+      _future = _load();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +55,7 @@ class DelfMockExamListScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: FutureBuilder<List<StudentDelfMockExam>>(
-        future: sl<StudentRemoteDataSource>().getDelfMockExams(),
+        future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -39,27 +71,86 @@ class DelfMockExamListScreen extends StatelessWidget {
             );
           }
           final exams = snapshot.data ?? const <StudentDelfMockExam>[];
-          if (exams.isEmpty) {
-            return const _StateMessage(
-              icon: Icons.school_outlined,
-              title: 'Aucun examen blanc publié',
-              subtitle:
-                  'Ton école n’a pas encore publié d’examen blanc pour le moment.',
-            );
-          }
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
             children: [
               _HeroCard(count: exams.length),
               const SizedBox(height: 16),
-              for (final exam in exams) ...[
-                _ExamTile(exam: exam),
-                const SizedBox(height: 12),
-              ],
+              _Filters(
+                classLevel: _classLevel,
+                level: _level,
+                levels: _delfLevels,
+                onChanged: _setFilters,
+              ),
+              const SizedBox(height: 16),
+              if (exams.isEmpty)
+                const _StateMessage(
+                  icon: Icons.school_outlined,
+                  title: 'Aucun examen blanc trouvé',
+                  subtitle:
+                      'Change la classe ou le niveau DELF pour voir les examens disponibles.',
+                )
+              else
+                for (final exam in exams) ...[
+                  _ExamTile(exam: exam),
+                  const SizedBox(height: 12),
+                ],
             ],
           );
         },
       ),
+    );
+  }
+}
+
+class _Filters extends StatelessWidget {
+  const _Filters({
+    required this.classLevel,
+    required this.level,
+    required this.levels,
+    required this.onChanged,
+  });
+
+  final String? classLevel;
+  final String? level;
+  final List<String> levels;
+  final void Function({String? classLevel, String? level}) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        DropdownButton<String?>(
+          value: classLevel,
+          hint: const Text('Classe'),
+          items: [
+            const DropdownMenuItem<String?>(value: null, child: Text('Recommandée')),
+            ...AuthConstants.classLevels.map(
+              (item) => DropdownMenuItem<String?>(
+                value: item,
+                child: Text(item),
+              ),
+            ),
+          ],
+          onChanged: (value) => onChanged(classLevel: value, level: level),
+        ),
+        DropdownButton<String?>(
+          value: level,
+          hint: const Text('Niveau DELF'),
+          items: [
+            const DropdownMenuItem<String?>(value: null, child: Text('Tous niveaux')),
+            ...levels.map(
+              (item) => DropdownMenuItem<String?>(
+                value: item,
+                child: Text('DELF $item'),
+              ),
+            ),
+          ],
+          onChanged: (value) => onChanged(classLevel: classLevel, level: value),
+        ),
+      ],
     );
   }
 }

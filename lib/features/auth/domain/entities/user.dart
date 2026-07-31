@@ -16,6 +16,7 @@ class User with _$User {
     @Default(true) bool isActive,
     String? phone,
     DateTime? dateOfBirth,
+    String? gender,
     String? classLevel,
     String? schoolId,
     String? profilePictureUrl,

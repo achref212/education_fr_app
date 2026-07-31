@@ -6,6 +6,7 @@ import '../models/progress_model.dart';
 abstract class ProgressRemoteDataSource {
   Future<ProgressModel> getProgress();
   Future<void> saveProgress(ProgressModel progress);
+  Future<void> completeLesson(String lessonId);
 }
 
 class ProgressRemoteDataSourceImpl implements ProgressRemoteDataSource {
@@ -26,5 +27,10 @@ class ProgressRemoteDataSourceImpl implements ProgressRemoteDataSource {
       ApiConstants.progress,
       data: progress.toJson(),
     );
+  }
+
+  @override
+  Future<void> completeLesson(String lessonId) async {
+    await _dio.post<void>(ApiConstants.progressLessonComplete(lessonId));
   }
 }

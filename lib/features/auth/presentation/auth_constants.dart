@@ -13,4 +13,10 @@ abstract class AuthConstants {
     '8ème année',
     '9ème année',
   ];
+
+  static const Map<String, String> genders = {
+    'female': 'Fille',
+    'male': 'Garçon',
+    'other': 'Autre',
+  };
 }

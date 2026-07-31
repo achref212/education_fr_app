@@ -10,4 +10,7 @@ abstract class ProgressRepository {
 
   /// Replaces the full progress state both locally and remotely.
   Future<Either<Failure, Unit>> saveProgress(Progress progress);
+
+  /// Completes a lesson through the backend so parcours XP and unlocks apply.
+  Future<Either<Failure, Unit>> completeLesson(String lessonId);
 }

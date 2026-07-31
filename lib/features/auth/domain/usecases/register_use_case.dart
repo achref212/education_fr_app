@@ -22,6 +22,7 @@ class RegisterUseCase implements UseCase<RegisterResult, RegisterParams> {
         schoolId: params.schoolId,
         phone: params.phone,
         dateOfBirth: params.dateOfBirth,
+        gender: params.gender,
       );
 }
 
@@ -35,6 +36,7 @@ class RegisterParams extends Equatable {
     this.schoolId,
     required this.phone,
     required this.dateOfBirth,
+    required this.gender,
   });
 
   final String email;
@@ -45,6 +47,7 @@ class RegisterParams extends Equatable {
   final String? schoolId;
   final String phone;
   final DateTime dateOfBirth;
+  final String gender;
 
   @override
   List<Object?> get props => [
@@ -56,5 +59,6 @@ class RegisterParams extends Equatable {
         schoolId,
         phone,
         dateOfBirth,
+        gender,
       ];
 }

@@ -30,6 +30,7 @@ class UserModel {
     this.isActive = true,
     this.phone,
     this.dateOfBirth,
+    this.gender,
     this.classLevel,
     this.schoolId,
     this.profilePictureUrl,
@@ -46,6 +47,7 @@ class UserModel {
   final String? phone;
   @JsonKey(fromJson: _dateFromJson, toJson: _dateToJson)
   final DateTime? dateOfBirth;
+  final String? gender;
   final String? classLevel;
   final String? schoolId;
   final String? profilePictureUrl;
@@ -66,6 +68,7 @@ class UserModel {
         isActive: isActive,
         phone: phone,
         dateOfBirth: dateOfBirth,
+        gender: gender,
         classLevel: classLevel,
         schoolId: schoolId,
         profilePictureUrl: profilePictureUrl,

@@ -11,6 +11,7 @@ import '../../../../core/usecase/usecase.dart';
 import '../../../../injection/injection_container.dart';
 import '../../../auth/domain/entities/user.dart';
 import '../../../auth/domain/usecases/logout_use_case.dart';
+import '../../../auth/presentation/auth_constants.dart';
 import '../../../theme/presentation/cubit/theme_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../cubit/profile_state.dart';
@@ -206,6 +207,13 @@ class _ProfileContent extends StatelessWidget {
                       icon: Icons.cake_outlined,
                       label: 'Date de naissance',
                       value: birthLabel,
+                    ),
+                    ProfileInfoTile(
+                      icon: Icons.person_outline_rounded,
+                      label: 'Genre',
+                      value: user.gender == null
+                          ? 'Non renseigné'
+                          : AuthConstants.genders[user.gender] ?? user.gender!,
                     ),
                     ProfileInfoTile(
                       icon: Icons.school_outlined,

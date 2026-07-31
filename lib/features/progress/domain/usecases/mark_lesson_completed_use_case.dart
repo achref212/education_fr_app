@@ -7,8 +7,8 @@ import '../repositories/progress_repository.dart';
 
 /// Marks a single lesson as completed for the current student.
 ///
-/// Fetches current progress, adds [lessonId] if not already present,
-/// then persists the updated progress.
+/// The backend awards XP and advances the parcours when the lesson belongs to
+/// the current student's active learning path.
 class MarkLessonCompletedUseCase
     implements UseCase<Unit, MarkLessonCompletedParams> {
   MarkLessonCompletedUseCase(this._repository);
@@ -16,24 +16,8 @@ class MarkLessonCompletedUseCase
   final ProgressRepository _repository;
 
   @override
-  Future<Either<Failure, Unit>> call(MarkLessonCompletedParams params) async {
-    final result = await _repository.getProgress();
-    return result.fold(
-      Left.new,
-      (progress) {
-        if (progress.hasCompletedLesson(params.lessonId)) {
-          return const Right(unit);
-        }
-        final updated = progress.copyWith(
-          lessonsCompleted: [
-            ...progress.lessonsCompleted,
-            params.lessonId,
-          ],
-        );
-        return _repository.saveProgress(updated);
-      },
-    );
-  }
+  Future<Either<Failure, Unit>> call(MarkLessonCompletedParams params) =>
+      _repository.completeLesson(params.lessonId);
 }
 
 class MarkLessonCompletedParams extends Equatable {

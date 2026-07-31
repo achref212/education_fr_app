@@ -18,6 +18,7 @@ class UpdateProfileUseCase implements UseCase<User, UpdateProfileParams> {
         lastName: params.lastName,
         phone: params.phone,
         dateOfBirth: params.dateOfBirth,
+        gender: params.gender,
         profilePictureUrl: params.profilePictureUrl,
       );
 }
@@ -28,6 +29,7 @@ class UpdateProfileParams extends Equatable {
     this.lastName,
     this.phone,
     this.dateOfBirth,
+    this.gender,
     this.profilePictureUrl,
   });
 
@@ -35,6 +37,7 @@ class UpdateProfileParams extends Equatable {
   final String? lastName;
   final String? phone;
   final DateTime? dateOfBirth;
+  final String? gender;
   final String? profilePictureUrl;
 
   @override
@@ -43,6 +46,7 @@ class UpdateProfileParams extends Equatable {
         lastName,
         phone,
         dateOfBirth,
+        gender,
         profilePictureUrl,
       ];
 }

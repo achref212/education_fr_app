@@ -14,6 +14,7 @@ class ParcoursStep extends Equatable {
     this.requiredStepId,
     this.score,
     this.attempts = 0,
+    this.answers = const <ParcoursStepAnswer>[],
   });
 
   final String id;
@@ -28,12 +29,14 @@ class ParcoursStep extends Equatable {
   final String? requiredStepId;
   final int? score;
   final int attempts;
+  final List<ParcoursStepAnswer> answers;
 
   bool get isLocked => status == 'locked';
   bool get isAvailable => status == 'available';
   bool get isInProgress => status == 'in_progress';
   bool get isCompleted => status == 'completed';
   bool get canStart => isAvailable || isInProgress;
+  bool get canOpen => !isLocked;
 
   @override
   List<Object?> get props => [
@@ -49,5 +52,19 @@ class ParcoursStep extends Equatable {
         requiredStepId,
         score,
         attempts,
+        answers,
       ];
+}
+
+class ParcoursStepAnswer extends Equatable {
+  const ParcoursStepAnswer({
+    required this.questionId,
+    required this.selectedIndex,
+  });
+
+  final String questionId;
+  final int selectedIndex;
+
+  @override
+  List<Object?> get props => [questionId, selectedIndex];
 }

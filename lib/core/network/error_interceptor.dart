@@ -44,7 +44,8 @@ class ErrorInterceptor extends Interceptor {
     }
 
     if (statusCode != null && statusCode >= 500) {
-      return const ServerFailure();
+      final detail = _extractDetail(err);
+      return ServerFailure(detail ?? 'Erreur serveur.');
     }
 
     final detail = _extractDetail(err);

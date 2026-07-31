@@ -30,6 +30,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? schoolId,
     required String phone,
     required DateTime dateOfBirth,
+    required String gender,
   }) async {
     try {
       final response = await _remoteDataSource.register(
@@ -41,6 +42,7 @@ class AuthRepositoryImpl implements AuthRepository {
         schoolId: schoolId,
         phone: phone,
         dateOfBirth: dateOfBirth,
+        gender: gender,
       );
       return Right(RegisterResult(
         email: email,
@@ -193,6 +195,7 @@ class AuthRepositoryImpl implements AuthRepository {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? gender,
     String? profilePictureUrl,
   }) async {
     try {
@@ -201,6 +204,7 @@ class AuthRepositoryImpl implements AuthRepository {
         lastName: lastName,
         phone: phone,
         dateOfBirth: dateOfBirth,
+        gender: gender,
         profilePictureUrl: profilePictureUrl,
       );
       return Right(userModel.toDomain());

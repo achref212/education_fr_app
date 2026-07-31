@@ -63,6 +63,32 @@ class ProgressRepositoryImpl implements ProgressRepository {
     }
   }
 
+  @override
+  Future<Either<Failure, Unit>> completeLesson(String lessonId) async {
+    final progressResult = await getProgress();
+    final Progress progress = progressResult.getOrElse(() => const Progress());
+    final updated = progress.hasCompletedLesson(lessonId)
+        ? progress
+        : progress.copyWith(
+            lessonsCompleted: [...progress.lessonsCompleted, lessonId],
+          );
+    try {
+      await _localDataSource.cacheProgress(ProgressModel.fromDomain(updated));
+    } catch (_) {
+      return const Left(CacheFailure());
+    }
+
+    final hasToken = await _tokenStorage.hasToken();
+    if (!hasToken) return const Right(unit);
+
+    try {
+      await _remoteDataSource.completeLesson(lessonId);
+      return const Right(unit);
+    } on DioException catch (e) {
+      return Left(_mapDioFailure(e));
+    }
+  }
+
   Future<Either<Failure, Progress>> _getCachedOrEmpty() async {
     try {
       final cached = await _localDataSource.getCachedProgress();

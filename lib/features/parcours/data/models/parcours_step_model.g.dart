@@ -20,6 +20,10 @@ ParcoursStepModel _$ParcoursStepModelFromJson(Map<String, dynamic> json) =>
       requiredStepId: json['requiredStepId'] as String?,
       score: (json['score'] as num?)?.toInt(),
       attempts: (json['attempts'] as num?)?.toInt() ?? 0,
+      answers: (json['answers'] as List<dynamic>?)
+              ?.map((e) => e as Map<String, dynamic>)
+              .toList() ??
+          const <Map<String, dynamic>>[],
     );
 
 Map<String, dynamic> _$ParcoursStepModelToJson(ParcoursStepModel instance) =>
@@ -36,4 +40,5 @@ Map<String, dynamic> _$ParcoursStepModelToJson(ParcoursStepModel instance) =>
       'requiredStepId': instance.requiredStepId,
       'score': instance.score,
       'attempts': instance.attempts,
+      'answers': instance.answers,
     };

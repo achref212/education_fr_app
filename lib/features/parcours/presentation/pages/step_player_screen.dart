@@ -8,6 +8,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../injection/injection_container.dart';
 import '../../../content/domain/entities/quiz_question.dart';
+import '../../domain/entities/parcours_step.dart';
 import '../../domain/usecases/complete_step_use_case.dart';
 import '../cubit/step_player_cubit.dart';
 import '../cubit/step_player_state.dart';
@@ -43,6 +44,14 @@ class _StepPlayerView extends StatefulWidget {
 class _StepPlayerViewState extends State<_StepPlayerView> {
   final Map<String, int> _answers = <String, int>{};
   int _currentQuestionIndex = 0;
+  late String _activeStepId;
+  QuizResultSummary? _lastQuizResult;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeStepId = widget.stepId;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +62,22 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
             showModalBottomSheet<void>(
               context: context,
               isScrollControlled: true,
+              isDismissible: false,
+              enableDrag: false,
               backgroundColor: Colors.transparent,
               builder: (BuildContext ctx) => StepCompleteSheet(
                 result: result,
+                quizResult: _lastQuizResult,
                 onContinue: () {
                   Navigator.of(ctx).pop();
                   context.router.maybePop(true);
                 },
+                onNextStep: result.nextStepId == null
+                    ? null
+                    : () {
+                        Navigator.of(ctx).pop();
+                        _openNextStep(context, result.nextStepId!);
+                      },
               ),
             );
           },
@@ -89,7 +107,7 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () =>
-                        context.read<StepPlayerCubit>().loadStep(widget.stepId),
+                        context.read<StepPlayerCubit>().loadStep(_activeStepId),
                     child: const Text('Réessayer'),
                   ),
                 ],
@@ -100,11 +118,16 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
               step.id,
               lesson.title,
               lesson.content,
+              isReview: step.isCompleted,
+              score: step.score,
             ),
             quiz: (step, questions, classLevel) => _buildQuizView(
               context,
               step.id,
               questions,
+              isReview: step.isCompleted,
+              score: step.score,
+              savedAnswers: step.answers,
             ),
             story: (step, story, classLevel) => _buildStoryView(
               context,
@@ -112,6 +135,8 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
               story.title,
               story.content,
               story.audioUrl,
+              isReview: step.isCompleted,
+              score: step.score,
             ),
           ),
         );
@@ -123,8 +148,10 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
     BuildContext context,
     String stepId,
     String title,
-    String content,
-  ) {
+    String content, {
+    required bool isReview,
+    int? score,
+  }) {
     return SafeArea(
       top: false,
       child: Padding(
@@ -134,10 +161,14 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
           children: [
             _LearningHeaderCard(
               icon: Icons.menu_book_rounded,
-              label: 'Leçon',
+              label: isReview ? 'Leçon terminée' : 'Leçon',
               title: title,
               color: AppColors.primary,
             ),
+            if (isReview) ...[
+              const SizedBox(height: 12),
+              _CompletedReviewBanner(score: score),
+            ],
             const SizedBox(height: 16),
             Expanded(
               child: _ReadableContentCard(
@@ -151,11 +182,18 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
             ),
             const SizedBox(height: 16),
             AppButton(
-              text: 'Terminer',
-              onPressed: () => context.read<StepPlayerCubit>().completeStep(
-                    stepId: stepId,
-                    score: 100,
-                  ),
+              text: isReview ? 'Revenir au parcours' : 'Terminer',
+              onPressed: () {
+                if (isReview) {
+                  context.router.maybePop(false);
+                  return;
+                }
+                setState(() => _lastQuizResult = null);
+                context.read<StepPlayerCubit>().completeStep(
+                      stepId: stepId,
+                      score: 100,
+                    );
+              },
             ),
           ],
         ),
@@ -168,8 +206,10 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
     String stepId,
     String title,
     String content,
-    String? audioUrl,
-  ) {
+    String? audioUrl, {
+    required bool isReview,
+    int? score,
+  }) {
     final resolvedAudioUrl = resolveMediaUrl(audioUrl);
     return SafeArea(
       top: false,
@@ -180,10 +220,18 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
           children: [
             _LearningHeaderCard(
               icon: Icons.auto_stories_rounded,
-              label: audioUrl == null ? 'Histoire' : 'Histoire audio',
+              label: isReview
+                  ? 'Histoire terminée'
+                  : audioUrl == null
+                      ? 'Histoire'
+                      : 'Histoire audio',
               title: title,
               color: AppColors.accentPurple,
             ),
+            if (isReview) ...[
+              const SizedBox(height: 12),
+              _CompletedReviewBanner(score: score),
+            ],
             if (resolvedAudioUrl.isNotEmpty) ...[
               const SizedBox(height: 12),
               Row(
@@ -216,11 +264,18 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
             ),
             const SizedBox(height: 16),
             AppButton(
-              text: 'Terminer',
-              onPressed: () => context.read<StepPlayerCubit>().completeStep(
-                    stepId: stepId,
-                    score: 100,
-                  ),
+              text: isReview ? 'Revenir au parcours' : 'Terminer',
+              onPressed: () {
+                if (isReview) {
+                  context.router.maybePop(false);
+                  return;
+                }
+                setState(() => _lastQuizResult = null);
+                context.read<StepPlayerCubit>().completeStep(
+                      stepId: stepId,
+                      score: 100,
+                    );
+              },
             ),
           ],
         ),
@@ -231,8 +286,14 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
   Widget _buildQuizView(
     BuildContext context,
     String stepId,
-    List<QuizQuestion> questions,
-  ) {
+    List<QuizQuestion> questions, {
+    required bool isReview,
+    int? score,
+    List<ParcoursStepAnswer> savedAnswers = const <ParcoursStepAnswer>[],
+  }) {
+    if (isReview) {
+      return _buildQuizReviewView(context, questions, score, savedAnswers);
+    }
     final QuizQuestion question = questions[_currentQuestionIndex];
     final progress = (_currentQuestionIndex + 1) / questions.length;
     return SafeArea(
@@ -288,6 +349,60 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
     );
   }
 
+  Widget _buildQuizReviewView(
+    BuildContext context,
+    List<QuizQuestion> questions,
+    int? score,
+    List<ParcoursStepAnswer> savedAnswers,
+  ) {
+    final answersByQuestionId = {
+      for (final answer in savedAnswers)
+        answer.questionId: answer.selectedIndex,
+    };
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _LearningHeaderCard(
+              icon: Icons.fact_check_rounded,
+              label: 'Quiz terminé',
+              title: 'Résultat et correction',
+              color: AppColors.success,
+            ),
+            const SizedBox(height: 12),
+            _CompletedReviewBanner(
+              score: score,
+              message:
+                  'Tu peux revoir les réponses correctes et les explications.',
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.separated(
+                itemCount: questions.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (BuildContext context, int index) {
+                  return _QuizCorrectionTile(
+                    question: questions[index],
+                    index: index,
+                    selectedIndex: answersByQuestionId[questions[index].id],
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+            AppButton(
+              text: 'Revenir au parcours',
+              onPressed: () => context.router.maybePop(false),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _handleQuizNext(
     BuildContext context,
     String stepId,
@@ -298,9 +413,21 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
       return;
     }
     int correct = 0;
+    final reviews = <QuizAnswerReview>[];
     for (final QuizQuestion question in questions) {
       final int? selected = _answers[question.id];
-      if (selected == question.correctIndex) correct++;
+      if (selected == null) continue;
+      final bool isCorrect = selected == question.correctIndex;
+      if (isCorrect) correct++;
+      reviews.add(
+        QuizAnswerReview(
+          question: question.question,
+          selectedAnswer: question.options[selected],
+          correctAnswer: question.options[question.correctIndex],
+          isCorrect: isCorrect,
+          explanation: question.explanation,
+        ),
+      );
     }
     final int score = ((correct / questions.length) * 100).round();
     final answers = questions
@@ -312,11 +439,28 @@ class _StepPlayerViewState extends State<_StepPlayerView> {
           ),
         )
         .toList();
+    setState(() {
+      _lastQuizResult = QuizResultSummary(
+        correctCount: correct,
+        totalCount: questions.length,
+        answers: reviews,
+      );
+    });
     context.read<StepPlayerCubit>().completeStep(
           stepId: stepId,
           score: score,
           answers: answers,
         );
+  }
+
+  void _openNextStep(BuildContext context, String stepId) {
+    setState(() {
+      _activeStepId = stepId;
+      _answers.clear();
+      _currentQuestionIndex = 0;
+      _lastQuizResult = null;
+    });
+    context.read<StepPlayerCubit>().loadStep(stepId);
   }
 }
 
@@ -411,6 +555,216 @@ class _ReadableContentCard extends StatelessWidget {
         ),
       ),
       child: child,
+    );
+  }
+}
+
+class _CompletedReviewBanner extends StatelessWidget {
+  const _CompletedReviewBanner({
+    required this.score,
+    this.message =
+        'Étape terminée. Tu peux la relire sans perdre ta progression.',
+  });
+
+  final int? score;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.success.withValues(alpha: isDark ? 0.18 : 0.10),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.36)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.check_circle_rounded, color: AppColors.success),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  score == null
+                      ? 'Résultat enregistré'
+                      : 'Résultat enregistré : $score%',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  message,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: isDark
+                        ? AppColors.darkBodySecondary
+                        : AppColors.lightBodySecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuizCorrectionTile extends StatelessWidget {
+  const _QuizCorrectionTile({
+    required this.question,
+    required this.index,
+    required this.selectedIndex,
+  });
+
+  final QuizQuestion question;
+  final int index;
+  final int? selectedIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final surface =
+        isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface;
+    final border = isDark ? AppColors.darkDivider : AppColors.lightDivider;
+    final textColor =
+        isDark ? AppColors.darkBodyPrimary : AppColors.lightBodyPrimary;
+    final correctAnswer = question.options[question.correctIndex];
+    final hasSelectedAnswer =
+        selectedIndex != null && selectedIndex! < question.options.length;
+    final selectedAnswer =
+        hasSelectedAnswer ? question.options[selectedIndex!] : null;
+    final isCorrect = selectedIndex == question.correctIndex;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Question ${index + 1}',
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            question.question,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.w800,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 12),
+          if (selectedAnswer != null) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: (isCorrect ? AppColors.success : AppColors.error)
+                    .withValues(alpha: isDark ? 0.18 : 0.10),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: (isCorrect ? AppColors.success : AppColors.error)
+                      .withValues(alpha: 0.34),
+                ),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    isCorrect
+                        ? Icons.check_circle_rounded
+                        : Icons.cancel_rounded,
+                    color: isCorrect ? AppColors.success : AppColors.error,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Ta réponse : $selectedAnswer',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: textColor,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ] else ...[
+            Text(
+              'Ta réponse enregistrée n’est pas disponible pour cette question.',
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isDark
+                    ? AppColors.darkBodySecondary
+                    : AppColors.lightBodySecondary,
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: isDark ? 0.18 : 0.10),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.success.withValues(alpha: 0.34),
+              ),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: AppColors.success,
+                  size: 20,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Bonne réponse : $correctAnswer',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: textColor,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (question.explanation != null &&
+              question.explanation!.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Text(
+              question.explanation!,
+              style: AppTextStyles.bodySmall.copyWith(
+                color: isDark
+                    ? AppColors.darkBodySecondary
+                    : AppColors.lightBodySecondary,
+                height: 1.35,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

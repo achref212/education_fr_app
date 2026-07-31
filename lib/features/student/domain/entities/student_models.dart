@@ -360,6 +360,361 @@ class StudentAchievements {
       );
 }
 
+class MultiplayerStudent {
+  const MultiplayerStudent({
+    required this.id,
+    required this.email,
+    required this.firstName,
+    required this.lastName,
+    this.classLevel,
+    this.gender,
+    this.profilePictureUrl,
+  });
+
+  final String id;
+  final String email;
+  final String firstName;
+  final String lastName;
+  final String? classLevel;
+  final String? gender;
+  final String? profilePictureUrl;
+
+  String get displayName => '$firstName $lastName'.trim();
+
+  factory MultiplayerStudent.fromJson(Map<String, dynamic> json) =>
+      MultiplayerStudent(
+        id: json['id']?.toString() ?? '',
+        email: json['email']?.toString() ?? '',
+        firstName: json['firstName']?.toString() ?? '',
+        lastName: json['lastName']?.toString() ?? '',
+        classLevel: json['classLevel']?.toString(),
+        gender: json['gender']?.toString(),
+        profilePictureUrl: json['profilePictureUrl']?.toString(),
+      );
+}
+
+class MultiplayerRoomRequest {
+  const MultiplayerRoomRequest({
+    required this.id,
+    required this.classLevel,
+    required this.participantIds,
+    required this.participants,
+    required this.status,
+    required this.createdAt,
+    this.requester,
+    this.message,
+    this.createdRoomId,
+    this.rejectionReason,
+  });
+
+  final String id;
+  final String classLevel;
+  final List<String> participantIds;
+  final List<MultiplayerStudent> participants;
+  final MultiplayerStudent? requester;
+  final String? message;
+  final String status;
+  final String? createdRoomId;
+  final String? rejectionReason;
+  final String createdAt;
+
+  factory MultiplayerRoomRequest.fromJson(Map<String, dynamic> json) =>
+      MultiplayerRoomRequest(
+        id: json['id']?.toString() ?? '',
+        classLevel: json['classLevel']?.toString() ?? '',
+        participantIds: (json['participantIds'] as List<dynamic>? ?? [])
+            .map((dynamic item) => item.toString())
+            .toList(),
+        participants: _list(json['participants'])
+            .map(MultiplayerStudent.fromJson)
+            .toList(),
+        requester: json['requester'] is Map<String, dynamic>
+            ? MultiplayerStudent.fromJson(
+                json['requester'] as Map<String, dynamic>,
+              )
+            : null,
+        message: json['message']?.toString(),
+        status: json['status']?.toString() ?? 'pending',
+        createdRoomId: json['createdRoomId']?.toString(),
+        rejectionReason: json['rejectionReason']?.toString(),
+        createdAt: json['createdAt']?.toString() ?? '',
+      );
+}
+
+class MultiplayerGame {
+  const MultiplayerGame({
+    required this.slug,
+    required this.name,
+    required this.minPlayers,
+    required this.maxPlayers,
+    this.description,
+  });
+
+  final String slug;
+  final String name;
+  final String? description;
+  final int minPlayers;
+  final int maxPlayers;
+
+  factory MultiplayerGame.fromJson(Map<String, dynamic> json) =>
+      MultiplayerGame(
+        slug: json['slug']?.toString() ?? '',
+        name: json['name']?.toString() ?? '',
+        description: json['description']?.toString(),
+        minPlayers: _int(json['minPlayers'], fallback: 2),
+        maxPlayers: _int(json['maxPlayers'], fallback: 8),
+      );
+}
+
+class MultiplayerRoom {
+  const MultiplayerRoom({
+    required this.id,
+    required this.roomCode,
+    required this.status,
+    required this.participantCount,
+    this.label,
+    this.classLevel,
+    this.activeSessionId,
+  });
+
+  final String id;
+  final String roomCode;
+  final String? label;
+  final String? classLevel;
+  final String status;
+  final String? activeSessionId;
+  final int participantCount;
+
+  factory MultiplayerRoom.fromJson(Map<String, dynamic> json) {
+    final data = _jsonMap(json['data']);
+    final participants = data['participants'];
+    final participantCount = json['participantCount'] == null
+        ? (participants is List ? participants.length : 0)
+        : _int(json['participantCount']);
+    return MultiplayerRoom(
+      id: json['id']?.toString() ?? '',
+      roomCode: json['roomCode']?.toString() ?? '',
+      label: json['label']?.toString(),
+      classLevel: json['classLevel']?.toString() ?? data['classLevel']?.toString(),
+      status: data['status']?.toString() ?? json['status']?.toString() ?? 'waiting',
+      activeSessionId: json['activeSessionId']?.toString(),
+      participantCount: participantCount,
+    );
+  }
+}
+
+class MultiplayerRoomDetail extends MultiplayerRoom {
+  const MultiplayerRoomDetail({
+    required super.id,
+    required super.roomCode,
+    required super.status,
+    required super.participantCount,
+    required this.participants,
+    super.label,
+    super.classLevel,
+    super.activeSessionId,
+    this.session,
+  });
+
+  final List<MultiplayerStudent> participants;
+  final MultiplayerSession? session;
+
+  factory MultiplayerRoomDetail.fromJson(Map<String, dynamic> json) =>
+      MultiplayerRoomDetail(
+        id: json['id']?.toString() ?? '',
+        roomCode: json['roomCode']?.toString() ?? '',
+        label: json['label']?.toString(),
+        classLevel: json['classLevel']?.toString(),
+        status: json['status']?.toString() ?? 'waiting',
+        activeSessionId: json['activeSessionId']?.toString(),
+        participantCount: (json['participants'] as List<dynamic>? ?? []).length,
+        participants: _list(json['participants'])
+            .map(MultiplayerStudent.fromJson)
+            .toList(),
+        session: json['session'] is Map<String, dynamic>
+            ? MultiplayerSession.fromJson(json['session'] as Map<String, dynamic>)
+            : null,
+      );
+}
+
+class MultiplayerSession {
+  const MultiplayerSession({
+    required this.id,
+    required this.status,
+    required this.currentRound,
+    required this.totalRounds,
+    required this.difficulty,
+  });
+
+  final String id;
+  final String status;
+  final int currentRound;
+  final int totalRounds;
+  final String difficulty;
+
+  factory MultiplayerSession.fromJson(Map<String, dynamic> json) =>
+      MultiplayerSession(
+        id: json['id']?.toString() ?? '',
+        status: json['status']?.toString() ?? 'waiting',
+        currentRound: _int(json['currentRound']),
+        totalRounds: _int(json['totalRounds']),
+        difficulty: json['difficulty']?.toString() ?? 'medium',
+      );
+}
+
+class MultiplayerQuestion {
+  const MultiplayerQuestion({
+    required this.id,
+    required this.question,
+    required this.options,
+    required this.round,
+    required this.totalRounds,
+  });
+
+  final String id;
+  final String question;
+  final List<String> options;
+  final int round;
+  final int totalRounds;
+
+  factory MultiplayerQuestion.fromJson(Map<String, dynamic> json) =>
+      MultiplayerQuestion(
+        id: json['id']?.toString() ?? '',
+        question: json['question']?.toString() ?? '',
+        options: (json['options'] as List<dynamic>? ?? [])
+            .map((dynamic item) => item.toString())
+            .toList(),
+        round: _int(json['round']),
+        totalRounds: _int(json['totalRounds']),
+      );
+}
+
+class MultiplayerLeaderboardEntry {
+  const MultiplayerLeaderboardEntry({
+    required this.userId,
+    required this.firstName,
+    required this.lastName,
+    required this.score,
+    required this.rank,
+    required this.finished,
+  });
+
+  final String userId;
+  final String firstName;
+  final String lastName;
+  final int score;
+  final int rank;
+  final bool finished;
+
+  String get displayName => '$firstName $lastName'.trim();
+
+  factory MultiplayerLeaderboardEntry.fromJson(Map<String, dynamic> json) =>
+      MultiplayerLeaderboardEntry(
+        userId: json['userId']?.toString() ?? '',
+        firstName: json['firstName']?.toString() ?? '',
+        lastName: json['lastName']?.toString() ?? '',
+        score: _int(json['score']),
+        rank: _int(json['rank']),
+        finished: json['finished'] == true,
+      );
+}
+
+class MultiplayerSessionState {
+  const MultiplayerSessionState({
+    required this.session,
+    required this.leaderboard,
+    this.currentQuestion,
+  });
+
+  final MultiplayerSession session;
+  final List<MultiplayerLeaderboardEntry> leaderboard;
+  final MultiplayerQuestion? currentQuestion;
+
+  factory MultiplayerSessionState.fromJson(Map<String, dynamic> json) =>
+      MultiplayerSessionState(
+        session: MultiplayerSession.fromJson(
+          (json['session'] as Map<String, dynamic>?) ?? <String, dynamic>{},
+        ),
+        leaderboard: _list(json['leaderboard'])
+            .map(MultiplayerLeaderboardEntry.fromJson)
+            .toList(),
+        currentQuestion: json['currentQuestion'] is Map<String, dynamic>
+            ? MultiplayerQuestion.fromJson(
+                json['currentQuestion'] as Map<String, dynamic>,
+              )
+            : null,
+      );
+}
+
+class MultiplayerSessionStart {
+  const MultiplayerSessionStart({
+    required this.session,
+    required this.questions,
+  });
+
+  final MultiplayerSession session;
+  final List<MultiplayerQuestion> questions;
+
+  factory MultiplayerSessionStart.fromJson(Map<String, dynamic> json) =>
+      MultiplayerSessionStart(
+        session: MultiplayerSession.fromJson(
+          (json['session'] as Map<String, dynamic>?) ?? <String, dynamic>{},
+        ),
+        questions: _list(json['questions'])
+            .map(MultiplayerQuestion.fromJson)
+            .toList(),
+      );
+}
+
+class MultiplayerAnswerResult {
+  const MultiplayerAnswerResult({
+    required this.isCorrect,
+    required this.points,
+    required this.totalScore,
+    required this.roundResult,
+  });
+
+  final bool isCorrect;
+  final int points;
+  final int totalScore;
+  final Map<String, dynamic> roundResult;
+
+  factory MultiplayerAnswerResult.fromJson(Map<String, dynamic> json) =>
+      MultiplayerAnswerResult(
+        isCorrect: json['isCorrect'] == true,
+        points: _int(json['points']),
+        totalScore: _int(json['totalScore']),
+        roundResult: _jsonMap(json['roundResult']),
+      );
+}
+
+class MultiplayerSessionResults {
+  const MultiplayerSessionResults({
+    required this.session,
+    required this.leaderboard,
+    this.myResult,
+  });
+
+  final MultiplayerSession session;
+  final List<MultiplayerLeaderboardEntry> leaderboard;
+  final MultiplayerLeaderboardEntry? myResult;
+
+  factory MultiplayerSessionResults.fromJson(Map<String, dynamic> json) =>
+      MultiplayerSessionResults(
+        session: MultiplayerSession.fromJson(
+          (json['session'] as Map<String, dynamic>?) ?? <String, dynamic>{},
+        ),
+        leaderboard: _list(json['leaderboard'])
+            .map(MultiplayerLeaderboardEntry.fromJson)
+            .toList(),
+        myResult: json['myResult'] is Map<String, dynamic>
+            ? MultiplayerLeaderboardEntry.fromJson(
+                json['myResult'] as Map<String, dynamic>,
+              )
+            : null,
+      );
+}
+
 class StudentAchievement {
   const StudentAchievement({
     required this.id,
@@ -411,4 +766,12 @@ double _double(dynamic value) {
 List<Map<String, dynamic>> _list(dynamic value) {
   if (value is! List) return <Map<String, dynamic>>[];
   return value.whereType<Map<String, dynamic>>().toList(growable: false);
+}
+
+Map<String, dynamic> _jsonMap(dynamic value) {
+  if (value is Map<String, dynamic>) return value;
+  if (value is Map) {
+    return value.map((key, value) => MapEntry(key.toString(), value));
+  }
+  return <String, dynamic>{};
 }

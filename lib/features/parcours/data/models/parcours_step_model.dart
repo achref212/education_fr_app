@@ -19,6 +19,7 @@ class ParcoursStepModel {
     this.requiredStepId,
     this.score,
     this.attempts = 0,
+    this.answers = const <Map<String, dynamic>>[],
   });
 
   final String id;
@@ -33,6 +34,7 @@ class ParcoursStepModel {
   final String? requiredStepId;
   final int? score;
   final int attempts;
+  final List<Map<String, dynamic>> answers;
 
   factory ParcoursStepModel.fromJson(Map<String, dynamic> json) =>
       _$ParcoursStepModelFromJson(json);
@@ -52,5 +54,19 @@ class ParcoursStepModel {
         requiredStepId: requiredStepId,
         score: score,
         attempts: attempts,
+        answers: answers
+            .map(_answerToDomain)
+            .whereType<ParcoursStepAnswer>()
+            .toList(),
       );
+
+  static ParcoursStepAnswer? _answerToDomain(Map<String, dynamic> json) {
+    final questionId = json['questionId'];
+    final selectedIndex = json['selectedIndex'];
+    if (questionId == null || selectedIndex is! num) return null;
+    return ParcoursStepAnswer(
+      questionId: questionId.toString(),
+      selectedIndex: selectedIndex.toInt(),
+    );
+  }
 }

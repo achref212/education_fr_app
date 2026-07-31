@@ -19,6 +19,7 @@ class RegisterCubit extends Cubit<RegisterState> {
     String? schoolId,
     required String phone,
     required DateTime dateOfBirth,
+    required String gender,
   }) async {
     emit(const RegisterState.loading());
     final result = await _registerUseCase(RegisterParams(
@@ -30,6 +31,7 @@ class RegisterCubit extends Cubit<RegisterState> {
       schoolId: schoolId,
       phone: phone,
       dateOfBirth: dateOfBirth,
+      gender: gender,
     ));
     result.fold(
       (failure) => emit(RegisterState.error(failure.message)),

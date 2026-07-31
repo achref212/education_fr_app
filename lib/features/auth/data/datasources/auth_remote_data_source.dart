@@ -22,6 +22,7 @@ abstract class AuthRemoteDataSource {
     String? schoolId,
     required String phone,
     required DateTime dateOfBirth,
+    required String gender,
   });
 
   Future<TokenResponseModel> verifyRegistration({
@@ -64,6 +65,7 @@ abstract class AuthRemoteDataSource {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? gender,
     String? profilePictureUrl,
   });
 
@@ -118,6 +120,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? schoolId,
     required String phone,
     required DateTime dateOfBirth,
+    required String gender,
   }) async {
     final response = await _dio.post<Map<String, dynamic>>(
       ApiConstants.register,
@@ -131,6 +134,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (schoolId != null && schoolId.isNotEmpty) 'schoolId': schoolId,
         'phone': phone,
         'dateOfBirth': _formatDate(dateOfBirth),
+        'gender': gender,
       },
     );
     return RegisterResponseModel.fromJson(response.data!);
@@ -240,6 +244,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? gender,
     String? profilePictureUrl,
   }) async {
     final response = await _dio.patch<Map<String, dynamic>>(
@@ -249,6 +254,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (lastName != null) 'lastName': lastName,
         if (phone != null) 'phone': phone,
         if (dateOfBirth != null) 'dateOfBirth': _formatDate(dateOfBirth),
+        if (gender != null) 'gender': gender,
         if (profilePictureUrl != null) 'profilePictureUrl': profilePictureUrl,
       },
     );

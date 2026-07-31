@@ -93,10 +93,16 @@ class _ParcoursView extends StatelessWidget {
                       step: step,
                       isLast: index == parcours.steps.length - 1,
                       animationDelay: Duration(milliseconds: index * 60),
-                      onTap: step.canStart
-                          ? () => context.router.push(
-                                StepPlayerRoute(stepId: step.id),
-                              )
+                      onTap: step.canOpen
+                          ? () async {
+                              final bool? changed = await context.router
+                                  .push<bool>(StepPlayerRoute(stepId: step.id));
+                              if (context.mounted && changed == true) {
+                                await context
+                                    .read<ParcoursCubit>()
+                                    .loadParcours();
+                              }
+                            }
                           : null,
                     );
                   }),

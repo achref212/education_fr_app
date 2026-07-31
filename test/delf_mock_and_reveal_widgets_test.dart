@@ -37,10 +37,10 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.text('Aucun examen blanc publié'), findsOneWidget);
+    expect(find.text('Aucun examen blanc trouvé'), findsOneWidget);
     expect(
       find.text(
-          'Ton école n’a pas encore publié d’examen blanc pour le moment.'),
+          'Change la classe ou le niveau DELF pour voir les examens disponibles.'),
       findsOneWidget,
     );
   });
@@ -127,7 +127,11 @@ class _FakeStudentDataSource implements StudentRemoteDataSource {
   final StudentDelfMockAttempt? attempt;
 
   @override
-  Future<List<StudentDelfMockExam>> getDelfMockExams() async => exams;
+  Future<List<StudentDelfMockExam>> getDelfMockExams({
+    String? classLevel,
+    String? level,
+  }) async =>
+      exams;
 
   @override
   Future<StudentHub> getHub() async => const StudentHub(
@@ -186,6 +190,59 @@ class _FakeStudentDataSource implements StudentRemoteDataSource {
   Future<StudentDelfMockAttempt> submitDelfMockAttempt({
     required String attemptId,
     required List<StudentDelfMockAnswer> answers,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerRoomRequest> createMultiplayerRequest({
+    required List<String> participantIds,
+    String? message,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<List<MultiplayerStudent>> getClassmates() => throw UnimplementedError();
+
+  @override
+  Future<List<MultiplayerGame>> getMultiplayerGames() => throw UnimplementedError();
+
+  @override
+  Future<List<MultiplayerRoom>> getMyMultiplayerRooms() => throw UnimplementedError();
+
+  @override
+  Future<List<MultiplayerRoomRequest>> getMultiplayerRequests() =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerRoomDetail> getMultiplayerRoom(String roomId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerSessionResults> getMultiplayerResults(String sessionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerSessionState> getMultiplayerSession(String sessionId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerRoom> joinMultiplayerRoom(String roomCode) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerAnswerResult> submitMultiplayerAnswer({
+    required String sessionId,
+    required String questionId,
+    required int selectedIndex,
+    required int timeMs,
+  }) =>
+      throw UnimplementedError();
+
+  @override
+  Future<MultiplayerSessionStart> startMultiplayerSession({
+    required String roomId,
+    required String gameSlug,
+    required String difficulty,
   }) =>
       throw UnimplementedError();
 }

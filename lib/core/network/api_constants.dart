@@ -44,6 +44,8 @@ class ApiConstants {
 
   // Progress
   static const String progress = '/progress';
+  static String progressLessonComplete(String lessonId) =>
+      '/progress/lessons/$lessonId/complete';
 
   // Parcours
   static const String parcoursMe = '/parcours/me';
@@ -53,6 +55,8 @@ class ApiConstants {
       '/parcours/steps/$stepId/start';
   static String parcoursStepComplete(String stepId) =>
       '/parcours/steps/$stepId/complete';
+  static String parcoursLessonComplete(String lessonId) =>
+      '/parcours/lessons/$lessonId/complete';
 
   // Content
   static const String lessons = '/lessons';
@@ -91,4 +95,21 @@ class ApiConstants {
       '/student/me/delf-mock-attempts/$attemptId';
   static String studentDelfMockAttemptSubmit(String attemptId) =>
       '/student/me/delf-mock-attempts/$attemptId/submit';
+  static const String studentClassmates = '/student/me/classmates';
+  static const String studentMultiplayerRequests =
+      '/student/me/multiplayer-room-requests';
+
+  // Multiplayer
+  static const String multiplayerGames = '/multiplayer/games';
+  static const String multiplayerJoin = '/multiplayer/join';
+  static const String multiplayerRoomsMine = '/multiplayer/rooms/mine';
+  static String multiplayerRoom(String roomId) => '/multiplayer/rooms/$roomId';
+  static String multiplayerRoomSessions(String roomId) =>
+      '/multiplayer/rooms/$roomId/sessions';
+  static String multiplayerSession(String sessionId) =>
+      '/multiplayer/sessions/$sessionId';
+  static String multiplayerSessionAnswers(String sessionId) =>
+      '/multiplayer/sessions/$sessionId/answers';
+  static String multiplayerSessionResults(String sessionId) =>
+      '/multiplayer/sessions/$sessionId/results';
 }

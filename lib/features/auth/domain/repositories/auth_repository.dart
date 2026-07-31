@@ -17,6 +17,7 @@ abstract class AuthRepository {
     String? schoolId,
     required String phone,
     required DateTime dateOfBirth,
+    required String gender,
   });
 
   Future<Either<Failure, User>> verifyRegistration({
@@ -55,6 +56,7 @@ abstract class AuthRepository {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? gender,
     String? profilePictureUrl,
   });
 

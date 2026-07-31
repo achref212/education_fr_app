@@ -211,6 +211,7 @@ class _FakeAuthRepository implements AuthRepository {
     String? schoolId,
     required String phone,
     required DateTime dateOfBirth,
+    required String gender,
   }) =>
       throw UnimplementedError();
 
@@ -238,6 +239,7 @@ class _FakeAuthRepository implements AuthRepository {
     String? lastName,
     String? phone,
     DateTime? dateOfBirth,
+    String? gender,
     String? profilePictureUrl,
   }) =>
       throw UnimplementedError();

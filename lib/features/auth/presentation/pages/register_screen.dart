@@ -42,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   DateTime? _dateOfBirth;
   String _phone = '';
   String? _classLevel;
+  String? _gender;
   String? _schoolId;
   String? _schoolLabel;
   bool _isOtherSchool = false;
@@ -124,6 +125,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
+  Future<void> _pickGender() async {
+    final selected = await showSelectionBottomSheet(
+      context: context,
+      title: 'Genre',
+      items: AuthConstants.genders.entries
+          .map((entry) => SelectionItem(id: entry.key, label: entry.value))
+          .toList(),
+    );
+    if (!mounted) return;
+    setState(() {
+      if (selected != null) _gender = selected.id;
+    });
+  }
+
   Future<void> _pickSchool() async {
     if (_isLoadingSchools) return;
     final selected = await showSelectionBottomSheet(
@@ -178,6 +193,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return null;
   }
 
+  String? _validateGender() {
+    if (_gender == null || _gender!.isEmpty) {
+      return 'Veuillez sélectionner un genre';
+    }
+    return null;
+  }
+
   bool _isValidEmail(String value) {
     return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(value);
   }
@@ -189,12 +211,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final birthdayError = _validateBirthday();
     final schoolError = _validateSchool();
     final classError = _validateClassLevel();
+    final genderError = _validateGender();
     final formIsValid = _formKey.currentState?.validate() ?? false;
 
     if (!formIsValid ||
         birthdayError != null ||
         schoolError != null ||
-        classError != null) {
+        classError != null ||
+        genderError != null) {
       return;
     }
 
@@ -207,6 +231,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           schoolId: _schoolId,
           phone: _phone,
           dateOfBirth: _dateOfBirth!,
+          gender: _gender!,
         );
   }
 
@@ -221,6 +246,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final birthdayError = _showValidationErrors ? _validateBirthday() : null;
     final schoolError = _showValidationErrors ? _validateSchool() : null;
     final classError = _showValidationErrors ? _validateClassLevel() : null;
+    final genderError = _showValidationErrors ? _validateGender() : null;
 
     return BlocProvider.value(
       value: sl<ThemeCubit>(),
@@ -364,6 +390,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 16),
                       _animatedSection(
                         delay: 250,
+                        child: TappablePickerField(
+                          label: 'Genre',
+                          hintText: 'Sélectionnez votre genre',
+                          value: _gender == null
+                              ? null
+                              : AuthConstants.genders[_gender] ?? _gender,
+                          errorText: genderError,
+                          onTap: _pickGender,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _animatedSection(
+                        delay: 300,
                         child: AppTextField(
                           label: 'Adresse e-mail',
                           hintText: 'Entrez votre e-mail',
@@ -383,7 +422,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 16),
                       _animatedSection(
-                        delay: 300,
+                        delay: 350,
                         child: AppTextField(
                           label: 'Mot de passe',
                           hintText: 'Créez un mot de passe',
@@ -403,7 +442,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 32),
                       _animatedSection(
-                        delay: 350,
+                        delay: 400,
                         child: AppButton(
                           text: "S'inscrire",
                           isLoading: isLoading,
